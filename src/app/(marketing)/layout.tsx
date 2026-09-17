@@ -1,10 +1,17 @@
-import { Navbar } from "@/components/layout/navbar";
+import { Navbar, type NavbarSession } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { getCurrentSession } from "@/lib/auth";
 
-export default function MarketingLayout({ children }: LayoutProps<"/">) {
+export default async function MarketingLayout({ children }: LayoutProps<"/">) {
+  const session = await getCurrentSession();
+
+  const navbarSession: NavbarSession = session
+    ? { full_name: session.profile.full_name, role: session.profile.role }
+    : null;
+
   return (
     <>
-      <Navbar />
+      <Navbar session={navbarSession} />
       <main className="flex-1">{children}</main>
       <Footer />
     </>
