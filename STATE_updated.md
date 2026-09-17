@@ -6,14 +6,15 @@
 - **Organization:** Student Development Council (SDC), IISER Bhopal
 - **Current Website:** https://sdcwebsite.vercel.app/
 - **Project Role:** User is the tech lead of SDC; AI acts as developer/architect.
-- **Status:** Architecture and MVP approved. Phase 4 (public website build) pending start.
+- **Status:** Architecture and MVP approved. Phase 5 (Supabase schema + Google Auth) implemented; awaiting credentials to activate.
 
 ## Current Objective
 - Build an SDC digital platform: a public website plus an authenticated student platform, delivered as one coherent product.
 - Implement incrementally in approved milestones. Do not build unapproved features.
 
 ## Approved Decisions
-- **Tech stack:** Next.js 15 (App Router) + TypeScript + Tailwind CSS. Supabase provides Postgres database, Google Auth, Storage, and Row-Level Security. Deploy on Vercel.
+- **Tech stack:** Next.js 16 (App Router) + TypeScript + Tailwind CSS. Supabase provides Postgres database, Google Auth, Storage, and Row-Level Security. Deploy on Vercel.
+- **2026-09-17 stack confirmation:** evaluated pivoting to PostgreSQL (Neon) + Prisma + Auth.js; **decision: keep Supabase**. Existing docs/plan unchanged.
 - **Authentication:** Google Sign-In only, restricted to `@iiserb.ac.in` hosted domain. No other sign-in methods in release 1.
 - **Roles:** `Student`, `Admin`, `Super Admin`. Admins seeded from an approved email list; access method to be confirmed.
 - **Release 1 (MVP + CotM):**
@@ -40,13 +41,16 @@
 | Maintain living project record | In progress | This file. |
 | Requirements checklist | In progress | Tracked here. |
 | Review current website | Done | Existing Next.js single-page landing reviewed; assets retained. |
-| Decide technical architecture | Approved | Next.js + Supabase + Vercel. |
-| Authentication model | Approved | Google, `@iiserb.ac.in` only. |
+| Decide technical architecture | Approved | Next.js + Supabase + Vercel (confirmed 2026-09-17). |
+| Authentication model | Done | Google, `@iiserb.ac.in` only; verified live with `samyak25@iiserb.ac.in`. |
 | Sitemap | Approved | See below. |
-| Define database schema | Pending | Next step with Supabase SQL migration. |
+| Define database schema | Done | Migration `supabase/migrations/0001_init.sql` written; RLS + triggers; applied to project `xwriyhblbltqkrconvyi`. |
 | Design direction | Approved (base) | Palette/typography final pass during design phase. |
 | Build public pages | Done | Phase 4 complete. All approved public routes live; lint clean; production build green. |
-| Authentication implementation | Not started | Phase 5. |
+| Supabase schema migration | Done | Applied + verified (13 tables); seed super admin row present. |
+| Google Sign-In + session + logout | Done | Verified live: OAuth → `/auth/callback` → session → navbar signed in; sign-out works. |
+| Role enforcement (admin gate) | Done | Role-based redirect in `proxy.ts`; role auto-assigned from `admin_emails` (super_admin confirmed on first sign-in). |
+| Authentication implementation | Done | End-to-end verified against live project. |
 | Events + registration | Not started | Phase 6. |
 | CotM v1 | Not started | Phase 7. |
 | Admin interface | Not started | Phase 8. |
@@ -73,10 +77,11 @@ users, roles (via role column on users), events, registrations, attendance (sche
 9. Deployment config (Vercel, env vars, callback URLs) + documentation.
 
 ## Pending Decisions (needed before their respective phase)
-- Admin identification/seeding: which emails become Admins/Super Admins and how.
+- Admin seeding: decided — `samyak25@iiserb.ac.in` = `super_admin` (`0002_seed_admin_emails.sql`); more emails can be added later.
 - Final palette/typography choice.
-- Event registration defaults: capacity numbers, cancellation allowed?, auto certificate (deferred).
+- Event registration defaults: capacity numbers, cancellation allowed? (defaults agreed — cancellable until deadline, optional capacity; to be reviewed when building the registration UI)
 - CotM: initial track topic/date for first run.
+- Supabase project + Google OAuth credentials (URL/anon key/redirect URIs).
 
 ## Development Rules
 - Follow the user's latest instructions as source of truth.
@@ -88,9 +93,18 @@ users, roles (via role column on users), events, registrations, attendance (sche
 - Accessibility and security considered from the start.
 
 ## Current Blocker
-- None. Ready to begin Phase 4 scaffolding on approval.
+- None for Phase 6 planning. Minor housekeeping: the service-role secret key (`SB_SECRET_…`) was shared in plaintext chat — consider rotating it once convenient. Google OAuth redirect-URI was fixed live (client `1375…bt` now includes the Supabase callback).
 
 ## Current Progress
 - Full brief understood; existing site reviewed; architecture, auth, sitemap, release scope, and CotM v1 approved.
 - Phase 4 (public website) complete: scaffolded Next.js 16 + Tailwind, built the design system and components, and shipped all approved public pages (Home, About, Initiatives, Events + detail, CotM + track, Resources, Announcements, Contact, Login shell, 404). Reused legacy brand assets and content. `npm run lint` and `npm run build` pass.
-- Next: Phase 5 — Supabase schema, Google Auth (@iiserb.ac.in), session handling, login/logout, role enforcement.
+- Phase 5 (schema + auth) implemented:
+  - Installed `@supabase/supabase-js` + `@supabase/ssr`.
+  - `src/lib/supabase/{server,client,middleware,actions}.ts` + `src/lib/auth.ts` (`getCurrentSession`).
+  - `src/proxy.ts` (Next 16 proxy = old middleware) — session refresh, `/dashboard`+`/admin` protection, role gate, login redirect-if-signed-in.
+  - Migration `supabase/migrations/20260917000000_init.sql` — all entities, RLS everywhere, `@iiserb.ac.in` signup trigger, profile-sync trigger, role assignment from `admin_emails`. Attendance/certificates are schema-only hooks.
+  - `/login` wired to real Google sign-in (`hd=iiserb.ac.in`) with loading/error states; `/auth/callback` code exchange; sign-out server action in navbar (desktop + mobile).
+  - Env guards so the site builds/renders without credentials; `.env.example` added.
+  - `npm run lint` clean; `npm run build` green (public pages static, `/login`+`/auth/callback` dynamic).
+- Next Phase 5 verification: live end-to-end confirmed — Google OAuth (`hd=iiserb.ac.in`), callback code exchange, session cookie, navbar signed-in state, sign-out. `samyak25@iiserb.ac.in` created as `super_admin`. `npm run lint` + `npm run build` green.
+- Next: Phase 6 (student dashboard + events + registration).
