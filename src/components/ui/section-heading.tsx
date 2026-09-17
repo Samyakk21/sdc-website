@@ -6,12 +6,14 @@ export function SectionHeading({
   description,
   align = "left",
   className = "",
+  id,
 }: {
   eyebrow?: string;
   title: string;
   description?: string;
   align?: "left" | "center";
   className?: string;
+  id?: string;
 }) {
   const alignment = align === "center" ? "mx-auto text-center" : "";
   return (
@@ -19,7 +21,7 @@ export function SectionHeading({
       {eyebrow ? (
         <p className="text-sm font-semibold uppercase tracking-wider text-brand-600">{eyebrow}</p>
       ) : null}
-      <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-900">{title}</h2>
+      <h2 id={id} className="mt-2 text-3xl font-bold tracking-tight text-slate-900">{title}</h2>
       {description ? <p className="mt-3 text-base leading-relaxed text-slate-600">{description}</p> : null}
     </div>
   );

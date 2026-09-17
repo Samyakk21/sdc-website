@@ -15,6 +15,7 @@ export type NavbarSession = {
 
 const navLinks = [
   { href: "/about", label: "About" },
+  { href: "/team", label: "Team" },
   { href: "/initiatives", label: "Initiatives" },
   { href: "/events", label: "Events" },
   { href: "/cotm", label: "Career of the Month" },

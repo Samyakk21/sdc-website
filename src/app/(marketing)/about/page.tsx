@@ -37,6 +37,18 @@ export default function AboutPage() {
           ))}
         </ul>
 
+        <div className="mt-12 flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 p-6">
+          <div>
+            <h2 className="text-lg font-semibold text-slate-900">Meet the team</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              The advisors, office bearers, and core members running SDC.
+            </p>
+          </div>
+          <Button href="/team" variant="outline" size="md">
+            View team
+          </Button>
+        </div>
+
         <div className="mt-12 rounded-2xl bg-ink-950 p-8 text-white sm:p-12">
           <div className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
             <div>

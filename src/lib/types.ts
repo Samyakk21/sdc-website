@@ -74,3 +74,17 @@ export type Announcement = {
   body: string;
   pinned: boolean;
 };
+
+export type TeamMember = {
+  name: string;
+  role: string;
+  image: string;
+  quote?: string;
+  linkedin?: string;
+  email?: string;
+};
+
+export type TeamGroup = {
+  title: string;
+  members: TeamMember[];
+};

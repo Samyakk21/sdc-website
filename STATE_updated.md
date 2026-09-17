@@ -107,4 +107,5 @@ users, roles (via role column on users), events, registrations, attendance (sche
   - Env guards so the site builds/renders without credentials; `.env.example` added.
   - `npm run lint` clean; `npm run build` green (public pages static, `/login`+`/auth/callback` dynamic).
 - Next Phase 5 verification: live end-to-end confirmed — Google OAuth (`hd=iiserb.ac.in`), callback code exchange, session cookie, navbar signed-in state, sign-out. `samyak25@iiserb.ac.in` created as `super_admin`. `npm run lint` + `npm run build` green.
+- Team page (interim, before Phase 6): extracted the full team dataset from the legacy site export (26 members: Faculty Advisor, Student Advisor, Secretary, Vice Secretaries, Core Committee, Trainee Team) — names, roles, quotes, LinkedIn, IISERB emails. Optimized the legacy team photos (30.6 MB → 1.9 MB, ≤640px) into `public/images/team/`. Added `TeamMember`/`TeamGroup` types, `src/lib/content/team.ts`, `TeamCard` component, `/team` page (linked from navbar + About). Lint clean, build green, `/team` renders.
 - Next: Phase 6 (student dashboard + events + registration).
