@@ -45,7 +45,7 @@
 | Sitemap | Approved | See below. |
 | Define database schema | Pending | Next step with Supabase SQL migration. |
 | Design direction | Approved (base) | Palette/typography final pass during design phase. |
-| Build public pages | Not started | Phase 4. |
+| Build public pages | Done | Phase 4 complete. All approved public routes live; lint clean; production build green. |
 | Authentication implementation | Not started | Phase 5. |
 | Events + registration | Not started | Phase 6. |
 | CotM v1 | Not started | Phase 7. |
@@ -92,4 +92,5 @@ users, roles (via role column on users), events, registrations, attendance (sche
 
 ## Current Progress
 - Full brief understood; existing site reviewed; architecture, auth, sitemap, release scope, and CotM v1 approved.
-- Next: scaffold the project and build public pages (Phase 4).
+- Phase 4 (public website) complete: scaffolded Next.js 16 + Tailwind, built the design system and components, and shipped all approved public pages (Home, About, Initiatives, Events + detail, CotM + track, Resources, Announcements, Contact, Login shell, 404). Reused legacy brand assets and content. `npm run lint` and `npm run build` pass.
+- Next: Phase 5 — Supabase schema, Google Auth (@iiserb.ac.in), session handling, login/logout, role enforcement.
