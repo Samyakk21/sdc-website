@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Student Development Council — Website
 
-## Getting Started
+Public website plus authenticated student platform for the Student Development Council (SDC) at IISER Bhopal.
 
-First, run the development server:
+- Stack: Next.js 16 (App Router) + TypeScript + Tailwind CSS v4
+- Auth/DB: Supabase (Postgres + Google Auth + Storage + RLS) — wiring in a later phase
+- Deploy: Vercel
+
+## Getting started
+
+Node 22 LTS via nvm:
 
 ```bash
+export NVM_DIR="$HOME/.nvm"; . "$NVM_DIR/nvm.sh"
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the dev server |
+| `npm run build` | Production build |
+| `npm run start` | Serve a production build |
+| `npm run lint` | ESLint |
 
-## Learn More
+## Project structure
 
-To learn more about Next.js, take a look at the following resources:
+```
+src/
+  app/(marketing)/     Public routes (Home, About, Initiatives, Events, CotM, Resources, Announcements, Contact, Login)
+  components/          Layout, UI primitives, and feature components
+  lib/content/         Seed/static content (mirrors future DB entities)
+  lib/                 Types, formatters, event-status helpers
+legacy/                The previous single-page site (HTML export + assets)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Static seed data in `src/lib/content/` stands in for database rows at this stage. In later phases it is
+replaced by Supabase-backed queries while the public pages remain the same.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Roadmap / decisions
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See `STATE_updated.md` for the living project record, approved decisions, and build phases.
+Do not build features outside the approved roadmap.
