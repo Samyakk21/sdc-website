@@ -29,14 +29,15 @@ export default function TeamPage() {
               align="center"
             />
             <ul
-              className={`mt-10 grid gap-6 ${
-                group.members.length === 1
-                  ? "mx-auto max-w-md"
-                  : "sm:grid-cols-2 lg:grid-cols-3"
+              className={`mt-10 flex flex-wrap justify-center gap-6 ${
+                group.members.length === 1 ? "mx-auto max-w-md" : ""
               }`}
             >
               {group.members.map((member) => (
-                <li key={member.name}>
+                <li
+                  key={member.name}
+                  className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+                >
                   <TeamCard member={member} />
                 </li>
               ))}

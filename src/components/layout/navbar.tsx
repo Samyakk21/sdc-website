@@ -46,10 +46,12 @@ export function Navbar({ session }: { session: NavbarSession }) {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
       <nav
-        className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8"
+        className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:justify-items-center lg:px-8"
         aria-label="Main"
       >
-        <Brand />
+        <div className="justify-self-start">
+          <Brand />
+        </div>
 
         <ul className="hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => {
@@ -70,7 +72,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
           })}
         </ul>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-self-end">
           {session ? (
             <>
               <span className="hidden items-center gap-2 sm:inline-flex">
