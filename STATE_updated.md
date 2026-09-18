@@ -51,7 +51,7 @@
 | Google Sign-In + session + logout | Done | Verified live: OAuth → `/auth/callback` → session → navbar signed in; sign-out works. |
 | Role enforcement (admin gate) | Done | Role-based redirect in `proxy.ts`; role auto-assigned from `admin_emails` (super_admin confirmed on first sign-in). |
 | Authentication implementation | Done | End-to-end verified against live project. |
-| Events + registration | Not started | Phase 6. |
+| Events + registration | Code complete; deployed | Phase 6. Seed migration applied live (8 events + `count_active_registrations` RPC verified via REST); repo lint+build green. Awaiting interactive register→dashboard→cancel browser test. |
 | CotM v1 | Not started | Phase 7. |
 | Admin interface | Not started | Phase 8. |
 | Attendance framework | Deferred | Schema-ready only. |
@@ -120,4 +120,5 @@ users, roles (via role column on users), events, registrations, attendance (sche
   - Also fixed: navbar links were off-centre (grid 3-col layout) and partial team rows (e.g. Vice Secretaries) now centre (flex-wrap justify-center). Committed as its own fix commit.
   - Lint clean; production build green (incl. `/dashboard` route); dev smoke test: `/events` 200 (fallback seed), `/dashboard` 307 → `/login` without session, event detail renders.
 - Next Phase 6 step: apply `20260917000200_seed_events.sql` to the live Supabase project, then log in and E2E-test register → dashboard → cancel against real data.
-- Next: Phase 6 (student dashboard + events + registration).
+- Phase 6 status check (2026-09-18): node_modules restored (transient npm network error, no proxy issue). `npm run lint` clean; `npm run build` green (all 14 routes + Proxy). Seed migration confirmed applied live — REST query lists all 8 events; `count_active_registrations` RPC callable (returned 0). `/events` + `/events/[slug]` render from DB (detail shows "Registration open"/seat state). Remaining: interactive browser test — sign in as `samyak25@iiserb.ac.in`, register → check `/dashboard` → cancel.
+- Next: interactive Phase 6 E2E (register → dashboard → cancel), then Phase 7 (CotM v1) planning.

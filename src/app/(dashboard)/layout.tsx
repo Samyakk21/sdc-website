@@ -14,7 +14,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <>
       <Navbar session={navbarSession} />
-      <main className="flex-1">{children}</main>
+      <main id="main" tabIndex={-1} className="flex-1">
+        {children}
+      </main>
       <Footer />
     </>
   );
