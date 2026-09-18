@@ -14,3 +14,12 @@ export function isEventOpen(event: { status: EventStatus; registrationDeadline?:
   if (!event.registrationDeadline) return true;
   return new Date(event.registrationDeadline).getTime() >= Date.now();
 }
+
+export function currentTimeMs() {
+  return Date.now();
+}
+
+export function isDeadlinePast(deadline?: string) {
+  if (!deadline) return false;
+  return new Date(`${deadline}T23:59:59`).getTime() < currentTimeMs();
+}

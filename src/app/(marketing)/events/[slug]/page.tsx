@@ -6,14 +6,17 @@ import { ArrowLeft, Calendar, Clock, MapPin, Users } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getEvent, getEventsByTrack } from "@/lib/content/events";
+import { RegisterPanel } from "@/components/events/register-panel";
+import { getEvent, getEventRow, getMyRegistration, getSeatsFilled } from "@/lib/events-repo";
+import { getEventsByTrack } from "@/lib/content/events";
 import { getTrack } from "@/lib/content/tracks";
-import { eventStatusMeta, isEventOpen } from "@/lib/event-status";
+import { getCurrentSession } from "@/lib/auth";
+import { eventStatusMeta, isDeadlinePast, isEventOpen } from "@/lib/event-status";
 import { formatDate, formatTime } from "@/lib/format";
 
 export function generateMetadata({ params }: PageProps<"/events/[slug]">): Promise<Metadata> {
-  return params.then(({ slug }) => {
-    const event = getEvent(slug);
+  return params.then(async ({ slug }) => {
+    const event = await getEvent(slug);
     if (!event) return {};
     return {
       title: event.title,
@@ -24,13 +27,96 @@ export function generateMetadata({ params }: PageProps<"/events/[slug]">): Promi
 
 export default async function EventPage({ params }: PageProps<"/events/[slug]">) {
   const { slug } = await params;
-  const event = getEvent(slug);
+  const event = await getEvent(slug);
   if (!event) notFound();
+
+  const session = await getCurrentSession();
+  const row = await getEventRow(slug);
 
   const meta = eventStatusMeta[event.status];
   const open = isEventOpen(event);
   const track = event.trackSlug ? getTrack(event.trackSlug) : undefined;
   const trackEvents = track ? getEventsByTrack(track.slug) : [];
+
+  const deadlinePast = isDeadlinePast(event.registrationDeadline);
+
+  const registration = row && session ? await getMyRegistration(row.id, session.profile.id) : null;
+  const registered = registration?.status === "registered";
+  const seatsFilled = row && event.capacity != null ? await getSeatsFilled(row.id) : 0;
+
+  let panel: React.ReactNode = null;
+
+  if (session && registered) {
+    panel = (
+      <RegisterPanel
+        slug={slug}
+        mode="registered"
+        cancelable={!deadlinePast}
+        seatsFilled={0}
+        deadlineLabel={event.registrationDeadline ? formatDate(event.registrationDeadline) : undefined}
+      />
+    );
+  } else if (open) {
+    if (session) {
+      panel = (
+        <RegisterPanel
+          slug={slug}
+          mode="register"
+          cancelable
+          seatsFilled={seatsFilled}
+          capacity={event.capacity}
+          deadlineLabel={event.registrationDeadline ? formatDate(event.registrationDeadline) : undefined}
+        />
+      );
+    } else {
+      panel = (
+        <>
+          <h2 className="text-lg font-semibold text-slate-900">Registration open</h2>
+          <p className="mt-2 text-sm leading-relaxed text-slate-600">
+            Sign in with your IISER Bhopal account to register. It only takes a moment.
+          </p>
+          <Button
+            href={`/login?next=${encodeURIComponent(`/events/${slug}`)}`}
+            className="mt-5 w-full"
+            size="lg"
+          >
+            Sign in to register
+          </Button>
+        </>
+      );
+    }
+  } else if (event.status === "upcoming") {
+    panel = (
+      <>
+        <h2 className="text-lg font-semibold text-slate-900">Registration opening soon</h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          Keep an eye on this page — registration will open closer to the event.
+        </p>
+      </>
+    );
+  } else if (event.status === "registration_closed") {
+    panel = (
+      <>
+        <h2 className="text-lg font-semibold text-slate-900">Registration closed</h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          Registrations for this event have closed.
+        </p>
+      </>
+    );
+  } else {
+    panel = (
+      <>
+        <h2 className="text-lg font-semibold text-slate-900">{meta.label}</h2>
+        <p className="mt-2 text-sm leading-relaxed text-slate-600">
+          {event.status === "completed"
+            ? "This event has ended."
+            : event.status === "cancelled"
+              ? "This event was cancelled."
+              : "This event is currently in progress."}
+        </p>
+      </>
+    );
+  }
 
   return (
     <Container className="py-12 sm:py-16">
@@ -95,42 +181,7 @@ export default async function EventPage({ params }: PageProps<"/events/[slug]">)
 
         <aside className="lg:col-span-1">
           <div className="sticky top-24 rounded-xl border border-slate-200 bg-slate-50 p-6">
-            {open ? (
-              <>
-                <h2 className="text-lg font-semibold text-slate-900">Registration open</h2>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  Sign in with your IISER Bhopal account to register. It only takes a moment.
-                </p>
-                <Button href="/login" className="mt-5 w-full" size="lg">
-                  Register for this event
-                </Button>
-              </>
-            ) : event.status === "upcoming" ? (
-              <>
-                <h2 className="text-lg font-semibold text-slate-900">Registration opening soon</h2>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  Keep an eye on this page — registration will open closer to the event.
-                </p>
-              </>
-            ) : event.status === "registration_closed" ? (
-              <>
-                <h2 className="text-lg font-semibold text-slate-900">Registration closed</h2>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  Registrations for this event have closed.
-                </p>
-              </>
-            ) : (
-              <>
-                <h2 className="text-lg font-semibold text-slate-900">{meta.label}</h2>
-                <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                  {event.status === "completed"
-                    ? "This event has ended."
-                    : event.status === "cancelled"
-                      ? "This event was cancelled."
-                      : "This event is currently in progress."}
-                </p>
-              </>
-            )}
+            {panel}
 
             {track ? (
               <div className="mt-6 border-t border-slate-200 pt-5">

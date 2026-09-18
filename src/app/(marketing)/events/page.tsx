@@ -6,7 +6,7 @@ import { Container } from "@/components/ui/container";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { EventCard } from "@/components/events/event-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { events } from "@/lib/content/events";
+import { listEvents } from "@/lib/events-repo";
 import { isEventOpen } from "@/lib/event-status";
 
 export const metadata: Metadata = {
@@ -14,7 +14,9 @@ export const metadata: Metadata = {
   description: "Upcoming events, workshops, and sessions from the Student Development Council at IISER Bhopal.",
 };
 
-export default function EventsPage() {
+export default async function EventsPage() {
+  const events = await listEvents();
+
   const byDate = (a: { date: string }, b: { date: string }) =>
     new Date(a.date).getTime() - new Date(b.date).getTime();
   const byDateDesc = (a: { date: string }, b: { date: string }) =>

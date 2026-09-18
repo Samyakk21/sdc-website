@@ -61,7 +61,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (isLoginPage) {
-    const url = new URL("/", origin);
+    const url = new URL("/dashboard", origin);
     return NextResponse.redirect(url);
   }
 

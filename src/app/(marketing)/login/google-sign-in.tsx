@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
-export function GoogleSignInButton({ next = "/" }: { next?: string }) {
+export function GoogleSignInButton({ next = "/dashboard" }: { next?: string }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
 

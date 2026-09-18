@@ -108,4 +108,16 @@ users, roles (via role column on users), events, registrations, attendance (sche
   - `npm run lint` clean; `npm run build` green (public pages static, `/login`+`/auth/callback` dynamic).
 - Next Phase 5 verification: live end-to-end confirmed — Google OAuth (`hd=iiserb.ac.in`), callback code exchange, session cookie, navbar signed-in state, sign-out. `samyak25@iiserb.ac.in` created as `super_admin`. `npm run lint` + `npm run build` green.
 - Team page (interim, before Phase 6): extracted the full team dataset from the legacy site export (26 members: Faculty Advisor, Student Advisor, Secretary, Vice Secretaries, Core Committee, Trainee Team) — names, roles, quotes, LinkedIn, IISERB emails. Optimized the legacy team photos (30.6 MB → 1.9 MB, ≤640px) into `public/images/team/`. Added `TeamMember`/`TeamGroup` types, `src/lib/content/team.ts`, `TeamCard` component, `/team` page (linked from navbar + About). Lint clean, build green, `/team` renders.
+- Phase 6 (dashboard + events + registration) — code complete, committed on `main`; DB-side steps still pending (see Current Blocker):
+  - `supabase/migrations/20260917000200_seed_events.sql` — seeds the 8-event catalog (used to be static) + `count_active_registrations()` RPC (security definer). **Not yet applied to the live project.**
+  - `src/lib/events-repo.ts` — DB-backed event reads (`listEvents`, `getEvent`, `getEventRow`, `getSeatsFilled`, `getMyRegistration`) with static-seed fallback when Supabase is unconfigured/empty.
+  - `src/lib/events/actions.ts` — `registerForEvent` / `cancelRegistration` Server Actions: enforce sign-in, `registration_open`, deadline, capacity, duplicate check; `revalidatePath` on success.
+  - `src/components/events/register-panel.tsx` — client panel (register vs. registered/cancel, seat counts, inline messages) via `useActionState`.
+  - Converted `/events` + `/events/[slug]` to DB source; detail page now shows seats filled and is interactive for signed-in students.
+  - `/dashboard` (new `(dashboard)` route group, protected by proxy): welcome, My Events (upcoming + history), available-to-register suggestions.
+  - Post-login redirect now goes to `/dashboard` (login page, callback route default, proxy `/login` redirect).
+  - Navbar: signed-in users get a Dashboard link (desktop + mobile).
+  - Also fixed: navbar links were off-centre (grid 3-col layout) and partial team rows (e.g. Vice Secretaries) now centre (flex-wrap justify-center). Committed as its own fix commit.
+  - Lint clean; production build green (incl. `/dashboard` route); dev smoke test: `/events` 200 (fallback seed), `/dashboard` 307 → `/login` without session, event detail renders.
+- Next Phase 6 step: apply `20260917000200_seed_events.sql` to the live Supabase project, then log in and E2E-test register → dashboard → cancel against real data.
 - Next: Phase 6 (student dashboard + events + registration).
