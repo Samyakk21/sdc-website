@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 
 import { Container } from "@/components/ui/container";
+import { LogoMark } from "@/components/layout/logo-mark";
 import { siteName, contact, links } from "@/lib/content/site";
 
 const pageLinks = [
@@ -21,8 +22,8 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-                SDC
+              <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-white/20">
+                <LogoMark className="h-8 w-8" />
               </span>
               <span className="text-sm font-bold text-white">{siteName}</span>
             </div>

@@ -12,7 +12,9 @@ export default async function MarketingLayout({ children }: LayoutProps<"/">) {
   return (
     <>
       <Navbar session={navbarSession} />
-      <main className="flex-1">{children}</main>
+      <main id="main" tabIndex={-1} className="flex-1">
+        {children}
+      </main>
       <Footer />
     </>
   );

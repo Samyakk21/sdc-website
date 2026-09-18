@@ -38,9 +38,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  const mobileLinks = session
-    ? [...navLinks, { href: "/dashboard", label: "Dashboard" }, ...mobileExtraLinks]
-    : [...navLinks, ...mobileExtraLinks];
+  const mobileLinks = [...navLinks, ...mobileExtraLinks];
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -81,11 +79,8 @@ export function Navbar({ session }: { session: NavbarSession }) {
             <>
               <Link
                 href="/dashboard"
-                className="hidden items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:inline-flex"
+                className="hidden items-center gap-2 rounded-lg px-2 py-2 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:inline-flex"
               >
-                Dashboard
-              </Link>
-              <span className="hidden items-center gap-2 sm:inline-flex">
                 <span
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700"
                   aria-hidden
@@ -95,7 +90,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
                 <span className="max-w-[10rem] truncate text-sm font-medium text-slate-700">
                   {session.full_name ?? "Your account"}
                 </span>
-              </span>
+              </Link>
               <form action={signOut}>
                 <button
                   type="submit"

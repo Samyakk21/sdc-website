@@ -1,7 +1,6 @@
-import Image from "next/image";
-
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { LogoMark } from "@/components/layout/logo-mark";
 
 export function Hero() {
   return (
@@ -37,13 +36,9 @@ export function Hero() {
         <div className="flex justify-center md:justify-end">
           <div className="relative">
             <div className="absolute -inset-6 -z-10 rounded-full bg-gradient-to-br from-brand-100 to-ink-100 blur-2xl" aria-hidden />
-            <Image
-              src="/images/sdc-hero.jpeg"
-              alt="SDC logo"
-              width={1402}
-              height={1404}
+            <LogoMark
               priority
-              className="h-72 w-72 rounded-full object-cover shadow-xl ring-8 ring-white/70 sm:h-80 sm:w-80 lg:h-96 lg:w-96"
+              className="h-72 w-72 rounded-full bg-white p-2 shadow-xl ring-8 ring-white/70 sm:h-80 sm:w-80 sm:p-3 lg:h-96 lg:w-96 lg:p-4"
             />
           </div>
         </div>
