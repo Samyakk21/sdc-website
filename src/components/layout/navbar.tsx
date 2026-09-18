@@ -38,6 +38,10 @@ export function Navbar({ session }: { session: NavbarSession }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
+  const mobileLinks = session
+    ? [...navLinks, { href: "/dashboard", label: "Dashboard" }, ...mobileExtraLinks]
+    : [...navLinks, ...mobileExtraLinks];
+
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
     return pathname === href || pathname.startsWith(`${href}/`);
@@ -75,6 +79,12 @@ export function Navbar({ session }: { session: NavbarSession }) {
         <div className="flex items-center gap-2 justify-self-end">
           {session ? (
             <>
+              <Link
+                href="/dashboard"
+                className="hidden items-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:inline-flex"
+              >
+                Dashboard
+              </Link>
               <span className="hidden items-center gap-2 sm:inline-flex">
                 <span
                   className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700"
@@ -120,7 +130,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
       {open ? (
         <div id="mobile-menu" className="border-t border-slate-200 bg-white lg:hidden">
           <ul className="mx-auto flex w-full max-w-7xl flex-col gap-1 px-4 py-4">
-            {[...navLinks, ...mobileExtraLinks].map((link) => {
+            {mobileLinks.map((link) => {
               const active = isActive(link.href);
               return (
                 <li key={link.href}>

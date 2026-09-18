@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = request.nextUrl;
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const next = searchParams.get("next") ?? "/dashboard";
 
   // Only allow relative paths to avoid open redirects via the `next` param.
   const safeNext = next.startsWith("/") && !next.startsWith("//") ? next : "/";

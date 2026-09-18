@@ -19,10 +19,10 @@ export default async function LoginPage({
   searchParams: Promise<{ next?: string; error?: string }>;
 }) {
   const session = await getCurrentSession();
-  if (session) redirect("/");
+  if (session) redirect("/dashboard");
 
   const { next, error } = await searchParams;
-  const redirectTo = next && next.startsWith("/") && !next.startsWith("//") ? next : "/";
+  const redirectTo = next && next.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
 
   return (
     <Container className="flex justify-center py-20 sm:py-28">
