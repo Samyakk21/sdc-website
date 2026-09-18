@@ -78,7 +78,7 @@ values
   (
     'cotm-quantum-challenge',
     'Quantum Computing: Challenge',
-    'The closing activity of Career of the Month — solve a hands-on challenge and consolidate what you\'ve learned across the month.',
+    'The closing activity of Career of the Month — solve a hands-on challenge and consolidate what you''ve learned across the month.',
     'registration_closed',
     '2026-10-17 14:00:00+05:30',
     '2026-10-17 18:00:00+05:30',
@@ -91,7 +91,7 @@ values
   (
     'mun-2026-info-session',
     'MUN 2026: Information Session',
-    'Everything you need to know about committees, portfolios, and how to register for IISER Bhopal\'s Model United Nations conference.',
+    'Everything you need to know about committees, portfolios, and how to register for IISER Bhopal''s Model United Nations conference.',
     'completed',
     '2026-08-20 17:00:00+05:30',
     '2026-08-20 18:00:00+05:30',
