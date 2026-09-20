@@ -14,8 +14,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://sdc-website-ten-umber.vercel.app"
+).replace(/\/$/, "");
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sdcwebsite.vercel.app"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "SDC | Student Development Council",
     template: "%s | Student Development Council",
@@ -25,11 +29,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Student Development Council",
     description: siteDescription,
-    url: "https://sdcwebsite.vercel.app",
+    url: siteUrl,
     siteName: "Student Development Council",
     images: [
       {
-        url: "https://sdcwebsite.vercel.app/images/sdc-hero.jpeg",
+        url: `${siteUrl}/images/sdc-hero.jpeg`,
         width: 1402,
         height: 1404,
         alt: "Student Development Council",
@@ -39,7 +43,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    images: ["https://sdcwebsite.vercel.app/images/sdc-hero.jpeg"],
+    images: [`${siteUrl}/images/sdc-hero.jpeg`],
   },
 };
 

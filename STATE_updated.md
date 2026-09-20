@@ -4,7 +4,7 @@
 ## Project Overview
 - **Project Name:** SDC Website
 - **Organization:** Student Development Council (SDC), IISER Bhopal
-- **Current Website:** https://sdcwebsite.vercel.app/
+- **Current Website:** https://sdc-website-ten-umber.vercel.app/
 - **Project Role:** User is the tech lead of SDC; AI acts as developer/architect.
 - **Status:** Architecture and MVP approved. Phase 5 (Supabase schema + Google Auth) implemented; awaiting credentials to activate.
 
