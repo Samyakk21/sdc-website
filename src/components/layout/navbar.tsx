@@ -20,7 +20,6 @@ const navLinks = [
   { href: "/events", label: "Events" },
   { href: "/cotm", label: "Career of the Month" },
   { href: "/resources", label: "Resources" },
-  { href: "/announcements", label: "Announcements" },
 ];
 
 const mobileExtraLinks = [{ href: "/contact", label: "Contact" }];
@@ -77,6 +76,14 @@ export function Navbar({ session }: { session: NavbarSession }) {
         <div className="flex items-center gap-2 justify-self-end">
           {session ? (
             <>
+              <Link
+                href="/dashboard"
+                aria-label="Dashboard"
+                title="Dashboard"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-xs font-bold text-brand-700 sm:hidden"
+              >
+                {initials(session.full_name)}
+              </Link>
               <Link
                 href="/dashboard"
                 className="hidden items-center gap-2 rounded-lg px-2 py-2 text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:inline-flex"
@@ -144,14 +151,23 @@ export function Navbar({ session }: { session: NavbarSession }) {
             })}
             <li className="mt-2 border-t border-slate-100 pt-3">
               {session ? (
-                <form action={signOut}>
-                  <button
-                    type="submit"
-                    className="block w-full rounded-lg border border-slate-300 px-4 py-2.5 text-center text-sm font-medium text-slate-700 hover:bg-slate-50"
+                <div className="space-y-2">
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-lg bg-ink-900 px-4 py-2.5 text-center text-sm font-medium text-white hover:bg-ink-800"
                   >
-                    Sign out ({session.full_name ?? "your account"})
-                  </button>
-                </form>
+                    Dashboard
+                  </Link>
+                  <form action={signOut}>
+                    <button
+                      type="submit"
+                      className="block w-full rounded-lg border border-slate-300 px-4 py-2.5 text-center text-sm font-medium text-slate-700 hover:bg-slate-50"
+                    >
+                      Sign out ({session.full_name ?? "your account"})
+                    </button>
+                  </form>
+                </div>
               ) : (
                 <Link
                   href="/login"

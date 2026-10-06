@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, BookOpenText, CalendarCheck, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
 
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { EventCard } from "@/components/events/event-card";
 import { ResourceCard } from "@/components/resources/resource-card";
-import { EmptyState } from "@/components/ui/empty-state";
 import { getTrack } from "@/lib/content/tracks";
 import { getEventsByTrack } from "@/lib/content/events";
 import { resources } from "@/lib/content/resources";
@@ -101,7 +100,8 @@ export default async function TrackPage({ params }: PageProps<"/cotm/[slug]">) {
                   <ArrowRight className="h-4 w-4" aria-hidden />
                 </Button>
                 <p className="mt-4 text-xs text-slate-500">
-                  Track events: {trackEvents.length} · Weeks: {track.timeline.length}
+                  {trackEvents.length > 0 ? `Track events: ${trackEvents.length} · ` : ""}
+                  Weeks: {track.timeline.length}
                 </p>
               </div>
 
@@ -117,13 +117,13 @@ export default async function TrackPage({ params }: PageProps<"/cotm/[slug]">) {
       </Container>
 
       <Container className="pb-16 sm:pb-20">
-        <section>
-          <SectionHeading
-            eyebrow="Track events"
-            title="Events in this track"
-            description="The sessions that make up this month's journey."
-          />
-          {trackEvents.length > 0 ? (
+        {trackEvents.length > 0 ? (
+          <section>
+            <SectionHeading
+              eyebrow="Track events"
+              title="Events in this track"
+              description="The sessions that make up this month's journey."
+            />
             <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {trackEvents.map((event) => (
                 <li key={event.slug}>
@@ -131,20 +131,16 @@ export default async function TrackPage({ params }: PageProps<"/cotm/[slug]">) {
                 </li>
               ))}
             </ul>
-          ) : (
-            <div className="mt-8">
-              <EmptyState icon={<CalendarCheck className="h-8 w-8" aria-hidden />} title="Events coming soon" description="Track events will be announced shortly." />
-            </div>
-          )}
-        </section>
+          </section>
+        ) : null}
 
-        <section className="mt-16">
-          <SectionHeading
-            eyebrow="Track resources"
-            title="Resources for this track"
-            description="Curated reading, videos, and roadmaps to deepen your understanding."
-          />
-          {trackResources.length > 0 ? (
+        {trackResources.length > 0 ? (
+          <section className="mt-16">
+            <SectionHeading
+              eyebrow="Track resources"
+              title="Resources for this track"
+              description="Curated reading, videos, and roadmaps to deepen your understanding."
+            />
             <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {trackResources.map((resource) => (
                 <li key={resource.slug}>
@@ -152,16 +148,8 @@ export default async function TrackPage({ params }: PageProps<"/cotm/[slug]">) {
                 </li>
               ))}
             </ul>
-          ) : (
-            <div className="mt-8">
-              <EmptyState
-                icon={<BookOpenText className="h-8 w-8" aria-hidden />}
-                title="No resources yet"
-                description="Track resources will be added as the month progresses."
-              />
-            </div>
-          )}
-        </section>
+          </section>
+        ) : null}
       </Container>
     </>
   );

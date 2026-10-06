@@ -23,10 +23,10 @@ export default function HomePage() {
       <Hero />
       <AboutSection />
       <InitiativesSection />
-      <EventsSection events={upcomingEvents} />
+      {upcomingEvents.length > 0 ? <EventsSection events={upcomingEvents} /> : null}
       {activeTrack ? <CotMSection track={activeTrack} /> : null}
-      <ResourcesSection resources={resources} />
-      <AnnouncementsSection announcements={announcements} />
+      {resources.length > 0 ? <ResourcesSection resources={resources} /> : null}
+      {announcements.length > 0 ? <AnnouncementsSection announcements={announcements} /> : null}
       <CtaBand />
     </>
   );

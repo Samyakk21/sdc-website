@@ -48,6 +48,7 @@ export const initiatives: Initiative[] = [
     description:
       "Turn your ideas into reality with support, mentorship, and resources. Explore the world of startups and innovation.",
     status: "active",
+    href: "https://ecell-iiser-bhopal.vercel.app/",
   },
 ];
 

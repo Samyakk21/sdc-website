@@ -15,9 +15,9 @@ export default function TeamPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Team"
-        title="Meet the SDC Team"
-        description="The faculty and students who run the Student Development Council at IISER Bhopal — advisors, office bearers, the core committee, and our trainees."
+        eyebrow="Team · Tenure 2025–26"
+        title="Meet the SDC Team (2025–26)"
+        description="The faculty and students who run the Student Development Council at IISER Bhopal for the 2025–26 tenure — advisors, office bearers, the core committee, and our trainees."
       />
       <Container className="space-y-20 py-16 sm:py-20">
         {teamGroups.map((group) => (
@@ -30,13 +30,17 @@ export default function TeamPage() {
             />
             <ul
               className={`mt-10 flex flex-wrap justify-center gap-6 ${
-                group.members.length === 1 ? "mx-auto max-w-md" : ""
+                group.members.length === 1 ? "mx-auto max-w-lg" : ""
               }`}
             >
               {group.members.map((member) => (
                 <li
                   key={member.name}
-                  className="w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+                  className={
+                    group.members.length === 1
+                      ? "w-full"
+                      : "w-full sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]"
+                  }
                 >
                   <TeamCard member={member} />
                 </li>

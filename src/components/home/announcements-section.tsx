@@ -19,7 +19,7 @@ export function AnnouncementsSection({ announcements, limit = 2 }: { announcemen
           description="Important news and notices from the SDC team."
           action={
             <Link
-              href="/announcements"
+              href="/events#announcements"
               className="inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
             >
               View all announcements

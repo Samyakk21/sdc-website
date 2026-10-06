@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { PageHeader } from "@/components/ui/page-header";
 import { Container } from "@/components/ui/container";
+import { EmptyState } from "@/components/ui/empty-state";
 import { ResourceBrowser } from "@/components/resources/resource-browser";
 import { resources } from "@/lib/content/resources";
 
@@ -17,10 +18,17 @@ export default function ResourcesPage() {
       <PageHeader
         eyebrow="Resources"
         title="Learn with curated resources"
-        description="Roadmaps, guides, videos, and references collected by the council — filter by category or search for something specific."
+        description="Roadmaps, guides, videos, and references collected by the council."
       />
       <Container className="py-16 sm:py-20">
-        <ResourceBrowser resources={resources} />
+        {resources.length > 0 ? (
+          <ResourceBrowser resources={resources} />
+        ) : (
+          <EmptyState
+            title="Nothing curated yet"
+            description="We only list a resource once there is something real to open — a link, a PDF, a video. Until then, check our Linktree and blogs in the footer."
+          />
+        )}
       </Container>
     </>
   );
