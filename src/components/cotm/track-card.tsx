@@ -26,7 +26,10 @@ export function TrackCard({ track, eventCount }: { track: Track; eventCount: num
       <p className="mt-2 text-sm leading-relaxed text-slate-600">{track.tagline}</p>
       <div className="mt-4 flex items-center gap-2 text-sm text-slate-600">
         <CalendarRange className="h-4 w-4 text-slate-400" aria-hidden />
-        <span>{eventCount} events across {track.timeline.length} weeks</span>
+        <span>
+          {eventCount > 0 ? `${eventCount} events across ` : ""}
+          {track.timeline.length} weeks
+        </span>
       </div>
       <div className="mt-auto flex items-center justify-between pt-5">
         <span className="text-sm font-medium text-brand-600">

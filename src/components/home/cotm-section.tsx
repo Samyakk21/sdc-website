@@ -2,7 +2,6 @@ import { ArrowRight, Compass } from "lucide-react";
 
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { getEventsByTrack } from "@/lib/content/events";
 import type { Track } from "@/lib/types";
@@ -18,7 +17,8 @@ export function CotMSection({ track }: { track: Track }) {
             <h2 className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl">{track.title}</h2>
             <p className="mt-4 text-base leading-relaxed text-slate-300">{track.tagline}</p>
             <p className="mt-3 text-sm leading-relaxed text-slate-400">
-              {trackEvents.length} events · {track.timeline.length} weeks · this month's structured track
+              {trackEvents.length > 0 ? `${trackEvents.length} events · ` : ""}
+              {track.timeline.length} weeks · this month's structured track
             </p>
             <div className="mt-8 flex flex-wrap items-center gap-3">
               <Button href={`/cotm/${track.slug}`} variant="primary" size="md">
@@ -49,13 +49,6 @@ export function CotMSection({ track }: { track: Track }) {
                 </li>
               ))}
             </ol>
-            <div className="mt-6 border-t border-white/10 pt-5">
-              <div className="flex items-center justify-between text-xs text-slate-400">
-                <span>Track progress</span>
-                <span>Live</span>
-              </div>
-              <Progress value={35} showLabel={false} className="mt-2" />
-            </div>
           </div>
         </div>
       </Container>

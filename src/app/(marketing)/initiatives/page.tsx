@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ArrowUpRight } from "lucide-react";
 
 import { PageHeader } from "@/components/ui/page-header";
 import { Container } from "@/components/ui/container";
@@ -31,6 +32,17 @@ export default function InitiativesPage() {
               </div>
               <div className="lg:col-span-2">
                 <p className="text-base leading-relaxed text-slate-600">{initiative.description}</p>
+                {initiative.href ? (
+                  <a
+                    href={initiative.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-brand-600 hover:text-brand-700"
+                  >
+                    Visit the {initiative.shortTitle} website
+                    <ArrowUpRight className="h-4 w-4" aria-hidden />
+                  </a>
+                ) : null}
               </div>
             </article>
           ))}

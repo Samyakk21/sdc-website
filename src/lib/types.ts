@@ -4,6 +4,8 @@ export type Initiative = {
   shortTitle: string;
   description: string;
   status: "active" | "planned";
+  /** external site for the initiative, when it lives outside this website */
+  href?: string;
 };
 
 export type EventStatus =

@@ -1,5 +1,5 @@
 # SDC Website — Project State
-**Last Updated:** 2026-09-17
+**Last Updated:** 2026-10-06
 
 ## Project Overview
 - **Project Name:** SDC Website
@@ -58,7 +58,7 @@
 | Certificates | Deferred | Schema-ready only. |
 
 ## Sitemap (Approved)
-- **Public:** `/` Home, `/about`, `/initiatives`, `/events` (+ `/events/[slug]`), `/cotm` + `/cotm/[slug]`, `/resources`, `/announcements`, `/contact`, `/login`.
+- **Public:** `/` Home, `/about`, `/initiatives`, `/events` (+ `/events/[slug]`, incl. the Announcements section at `/events#announcements`), `/cotm` + `/cotm/[slug]`, `/resources`, `/contact`, `/login`. (`/announcements` is no longer a page — 308-redirects to `/events#announcements`.)
 - **Student (auth):** `/dashboard`, `/dashboard/events`, `/dashboard/progress`, `/dashboard/profile`.
 - **Admin (auth + role):** `/admin` (events, cotm, resources, announcements, users, settings).
 
@@ -122,3 +122,12 @@ users, roles (via role column on users), events, registrations, attendance (sche
 - Next Phase 6 step: apply `20260917000200_seed_events.sql` to the live Supabase project, then log in and E2E-test register → dashboard → cancel against real data.
 - Phase 6 status check (2026-09-18): node_modules restored (transient npm network error, no proxy issue). `npm run lint` clean; `npm run build` green (all 14 routes + Proxy). Seed migration confirmed applied live — REST query lists all 8 events; `count_active_registrations` RPC callable (returned 0). `/events` + `/events/[slug]` render from DB (detail shows "Registration open"/seat state). Remaining: interactive browser test — sign in as `samyak25@iiserb.ac.in`, register → check `/dashboard` → cancel.
 - Next: interactive Phase 6 E2E (register → dashboard → cancel), then Phase 7 (CotM v1) planning.
+- Content/UX edit batch (2026-10-06), per user's live-site review:
+  - **E-Cell link:** `Initiative.href` field added; the entrepreneurship card on Home and the `/initiatives` article now link to https://ecell-iiser-bhopal.vercel.app/ (opens in a new tab).
+  - **Events cleared:** static seed emptied (`src/lib/content/events.ts`) *and* live DB wiped via `supabase/migrations/20261006000000_clear_events.sql` (8 seeded events deleted; 3 registrations cascade-deleted — all FKs to events are `on delete cascade`). `/events` now shows the announcements section + a "registration closed" empty state; no bare section headings for empty lists.
+  - **Resources cleared:** all 7 placeholder cards removed (none linked anywhere real); `/resources` shows one honest empty state instead of filter/search UI over nothing; the home Resources section is hidden while the list is empty. `resources.ts` comment says: only add a resource once there is something real to open.
+  - **Filler removed:** home sections (Events/Resources/Announcements) render only when they have content; CoTM home section's fake "Track progress 35%" bar deleted; track detail page's empty "Events coming soon"/"No resources yet" sections hidden; "0 events" counts dropped from CoTM home section and track cards.
+  - **Team page:** single-member groups (Faculty Advisor, Student Advisor, Secretary) were rendering ~133px-wide cards — the `li` kept `sm:w-[calc(50%-0.75rem)] lg:w-[calc(33.333%-1rem)]` inside a `max-w-md` ul, so 1/3 of 448px. Now `w-full` in a wider `max-w-lg` ul, so names/roles/quotes no longer wrap. Title/description now state the **2025–26 tenure**.
+  - **Announcements folded into Events:** `/announcements` page deleted; it's now a section on `/events` (`id="announcements"`, pinned-first). Navbar + footer links removed; home "View all announcements" points at `/events#announcements`; `next.config.ts` adds a permanent 308 redirect so old links keep working.
+  - **Mobile dashboard:** signed-in users on small screens now get an icon-only avatar Dashboard button in the top bar **and** a Dashboard button at the top of the mobile menu (previously both were desktop-only, so mobile users had no way in).
+  - Verified: `npm run lint` clean, `npm run build` green (stale `.next` had to be cleared after deleting the route), local prod-server checks passed — 308 redirect, announcements section present, no empty headings, team `<li class="w-full">` in `max-w-lg`, E-Cell anchor live.

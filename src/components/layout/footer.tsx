@@ -11,7 +11,6 @@ const pageLinks = [
   { href: "/events", label: "Events" },
   { href: "/cotm", label: "Career of the Month" },
   { href: "/resources", label: "Resources" },
-  { href: "/announcements", label: "Announcements" },
   { href: "/contact", label: "Contact" },
 ];
 
