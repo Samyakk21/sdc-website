@@ -48,6 +48,32 @@ export default async function EventsPage() {
 
       <Container className="py-16 sm:py-20">
         <div className="space-y-16">
+          <section aria-labelledby="open-now-heading">
+            <SectionHeading
+              id="open-now-heading"
+              eyebrow="Open now"
+              title="Register for these sessions"
+              description="Slots are limited — secure your seat before the deadline."
+            />
+            {registerNow.length > 0 ? (
+              <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {registerNow.map((event) => (
+                  <li key={event.slug}>
+                    <EventCard event={event} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="mt-8">
+                <EmptyState
+                  icon={<CalendarX2 className="h-8 w-8" aria-hidden />}
+                  title="Registration is closed right now"
+                  description="New registrations will open when the next event is announced."
+                />
+              </div>
+            )}
+          </section>
+
           {sortedAnnouncements.length > 0 ? (
             <section id="announcements" aria-labelledby="announcements-heading">
               <SectionHeading
@@ -77,32 +103,6 @@ export default async function EventsPage() {
               </ol>
             </section>
           ) : null}
-
-          <section aria-labelledby="open-now-heading">
-            <SectionHeading
-              id="open-now-heading"
-              eyebrow="Open now"
-              title="Register for these sessions"
-              description="Slots are limited — secure your seat before the deadline."
-            />
-            {registerNow.length > 0 ? (
-              <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {registerNow.map((event) => (
-                  <li key={event.slug}>
-                    <EventCard event={event} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="mt-8">
-                <EmptyState
-                  icon={<CalendarX2 className="h-8 w-8" aria-hidden />}
-                  title="Registration is closed right now"
-                  description="New registrations will open when the next event is announced."
-                />
-              </div>
-            )}
-          </section>
 
           {comingUp.length > 0 ? (
             <section aria-labelledby="coming-up-heading">
