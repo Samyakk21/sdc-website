@@ -52,6 +52,7 @@
 | Role enforcement (admin gate) | Done | Role-based redirect in `proxy.ts`; role auto-assigned from `admin_emails` (super_admin confirmed on first sign-in). |
 | Authentication implementation | Done | End-to-end verified against live project. |
 | Events + registration | Code complete; deployed | Phase 6. Seed migration applied live (8 events + `count_active_registrations` RPC verified via REST); repo lint+build green. Awaiting interactive register→dashboard→cancel browser test. |
+| Superuser event management | Planned (not built) | Plan below; needs scheduling before Phase 8. |
 | CotM v1 | Not started | Phase 7. |
 | Admin interface | Not started | Phase 8. |
 | Attendance framework | Deferred | Schema-ready only. |
@@ -75,6 +76,21 @@ users, roles (via role column on users), events, registrations, attendance (sche
 7. Admin area: content management for events/resources/announcements/CotM/users.
 8. Responsive/accessibility/security pass; error/empty/loading states.
 9. Deployment config (Vercel, env vars, callback URLs) + documentation.
+
+## Planned: Superuser event management (events page)
+**Status:** plan only — not built (2026-10-06). Do not implement until scheduled (natural slot: Phase 8a, events-only admin CRUD ahead of the full admin interface).
+- **Goal:** a signed-in superuser can add events and edit their details from the site itself — no SQL, no code edits. `src/lib/events-repo.ts` already reads `public.events`, so anything saved appears on `/events` and `/events/[slug]` with no extra wiring.
+- **Who:** `users.role = super_admin` at first (admins later, after a role review). Enforced twice: route gate in `src/proxy.ts` (next to the existing `/dashboard` + `/admin` checks) **and** RLS write policies in the database.
+- **Surface:** `/admin/events` — list (draft / open / closed / past) plus new, edit, delete.
+- **Fields:** title, tagline, description, date + start/end time (IST), mode (online | offline | hybrid), location, organizer, capacity, registration deadline, status, optional CoTM track link.
+- **Server actions:** `createEvent` / `updateEvent` / `deleteEvent`; server-side validation (required fields, deadline before date, sane times, unique slug); `revalidatePath` for `/events` and the detail page after every write.
+- **DB migration:** `INSERT`/`UPDATE`/`DELETE` RLS policies on `public.events` scoped to `role in ('admin','super_admin')` — today reads are public and writes are migration-only. No schema changes needed; `count_active_registrations()` already covers seat counts.
+- **Decisions needed before build:**
+  - Publish flow: add a `draft` status (hidden from public queries) vs. create straight as `upcoming`/`registration_open`.
+  - Validation: hand-rolled vs. adding `zod` (repo has no validation dependency today).
+  - Slug policy when a title is edited: keep the original slug vs. regenerate with a redirect.
+  - Scope: super_admin only for v1 (recommended) vs. all admins.
+- **Out of scope for v1:** CoTM track/resource editing, announcements admin (a content file today), event images/banners, notifications/email.
 
 ## Pending Decisions (needed before their respective phase)
 - Admin seeding: decided — `samyak25@iiserb.ac.in` = `super_admin` (`0002_seed_admin_emails.sql`); more emails can be added later.
@@ -131,3 +147,9 @@ users, roles (via role column on users), events, registrations, attendance (sche
   - **Announcements folded into Events:** `/announcements` page deleted; it's now a section on `/events` (`id="announcements"`, pinned-first). Navbar + footer links removed; home "View all announcements" points at `/events#announcements`; `next.config.ts` adds a permanent 308 redirect so old links keep working.
   - **Mobile dashboard:** signed-in users on small screens now get an icon-only avatar Dashboard button in the top bar **and** a Dashboard button at the top of the mobile menu (previously both were desktop-only, so mobile users had no way in).
   - Verified: `npm run lint` clean, `npm run build` green (stale `.next` had to be cleared after deleting the route), local prod-server checks passed — 308 redirect, announcements section present, no empty headings, team `<li class="w-full">` in `max-w-lg`, E-Cell anchor live.
+- Content purge + root consolidation (2026-10-06, second batch):
+  - **Events page stays empty for now:** announcements section moved to directly under the registration section ("Open now"); all 3 seed announcements cleared, so `/events` renders only the registration empty state today. The announcements section is kept in code and reappears automatically (below registration, pinned-first) the moment notices are added to `src/lib/content/announcements.ts`.
+  - **CoTM track list emptied:** no track is running; `tracks.ts` now exports `[]`, so `/cotm` shows only the program explainer — the "Current" and "All tracks" sections render nothing while there are no tracks — and the home CoTM section stays hidden. Next track topic remains a pending decision.
+  - **Seed migration cleaned:** `20260917000200_seed_events.sql` now carries only the `count_active_registrations()` RPC; the 8-event catalog it used to insert is dead (`20261006000000_clear_events.sql` wipes it anyway).
+  - **Superuser events:** plan added above ("Planned: Superuser event management") — deliberately not built in this batch.
+  - **Project root consolidated (confirmed with user):** `~/Documents/Projects/sdc-website` is now the single checkout — demo work stripped, fast-forwarded to `b1855b1`, `.env.local` copied over, session moved here. `~/Documents/Projects/SDC_website` deleted. The COTM demo deliverable was discarded as requested; it is no longer an active work item.

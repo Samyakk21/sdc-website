@@ -98,16 +98,18 @@ export default function CotMPage() {
           </section>
         ) : null}
 
-        <section className="mt-16">
-          <SectionHeading eyebrow="Tracks" title="All tracks" />
-          <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-            {tracks.map((track) => (
-              <li key={track.slug}>
-                <TrackCard track={track} eventCount={getEventsByTrack(track.slug).length} />
-              </li>
-            ))}
-          </ul>
-        </section>
+        {tracks.length > 0 ? (
+          <section className="mt-16">
+            <SectionHeading eyebrow="Tracks" title="All tracks" />
+            <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+              {tracks.map((track) => (
+                <li key={track.slug}>
+                  <TrackCard track={track} eventCount={getEventsByTrack(track.slug).length} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </Container>
     </>
   );
