@@ -14,6 +14,25 @@ import { getCurrentSession } from "@/lib/auth";
 import { eventStatusMeta, isDeadlinePast, isEventOpen } from "@/lib/event-status";
 import { formatDate, formatTime } from "@/lib/format";
 
+/** Renders a description keeping its line breaks and turning URLs into links. */
+function renderDescription(text: string) {
+  return text.split(/(https?:\/\/\S+)/g).map((part, index) =>
+    /^https?:\/\//.test(part) ? (
+      <a
+        key={index}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-medium text-brand-600 underline underline-offset-2 hover:text-brand-700"
+      >
+        {part}
+      </a>
+    ) : (
+      part
+    ),
+  );
+}
+
 export function generateMetadata({ params }: PageProps<"/events/[slug]">): Promise<Metadata> {
   return params.then(async ({ slug }) => {
     const event = await getEvent(slug);
@@ -140,7 +159,9 @@ export default async function EventPage({ params }: PageProps<"/events/[slug]">)
           </div>
           <h1 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{event.title}</h1>
           <p className="mt-3 text-sm font-medium text-slate-500">Organised by {event.organizer}</p>
-          <p className="mt-6 text-base leading-relaxed text-slate-700">{event.description}</p>
+          <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-slate-700">
+            {renderDescription(event.description)}
+          </p>
 
           <div className="mt-8 rounded-xl border border-slate-200 bg-white p-6">
             <ul className="space-y-4 text-sm text-slate-700">
