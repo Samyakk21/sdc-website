@@ -6,13 +6,13 @@ import { CotMSection } from "@/components/home/cotm-section";
 import { ResourcesSection } from "@/components/home/resources-section";
 import { AnnouncementsSection } from "@/components/home/announcements-section";
 import { CtaBand } from "@/components/home/cta-band";
-import { events } from "@/lib/content/events";
+import { listEvents } from "@/lib/events-repo";
 import { tracks } from "@/lib/content/tracks";
 import { resources } from "@/lib/content/resources";
 import { announcements } from "@/lib/content/announcements";
 
-export default function HomePage() {
-  const upcomingEvents = events
+export default async function HomePage() {
+  const upcomingEvents = (await listEvents())
     .filter((event) => event.status === "registration_open" || event.status === "upcoming")
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
@@ -21,12 +21,12 @@ export default function HomePage() {
   return (
     <>
       <Hero />
+      {announcements.length > 0 ? <AnnouncementsSection announcements={announcements} /> : null}
       <AboutSection />
       <InitiativesSection />
       {upcomingEvents.length > 0 ? <EventsSection events={upcomingEvents} /> : null}
       {activeTrack ? <CotMSection track={activeTrack} /> : null}
       {resources.length > 0 ? <ResourcesSection resources={resources} /> : null}
-      {announcements.length > 0 ? <AnnouncementsSection announcements={announcements} /> : null}
       <CtaBand />
     </>
   );
