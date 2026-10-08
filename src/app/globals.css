@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -54,4 +56,153 @@ body {
 ::selection {
   background-color: var(--color-brand-100);
   color: var(--color-brand-900);
+}
+
+/* ------------------------------ Dark mode ------------------------------
+   Light mode above is untouched: mainly white + red. Dark mode flips the
+   scheme to soft "LCD black" + SDC blue by remapping the custom properties
+   that every Tailwind utility compiles to, so the whole site follows at
+   once. Variables that serve both a background and a text role are flipped
+   background-first (white text must stay legible on fills) and their text
+   uses are re-tuned in the targeted overrides below.
+
+   These rules are deliberately unlayered: unlayered CSS outranks Tailwind's
+   layered utilities no matter the specificity, which is what lets a single
+   `.dark .bg-white` restyle every card without touching component markup.
+   Hover/focus states that would be masked by such rules get matching
+   unlayered rules back, ordered after them. */
+
+.dark {
+  color-scheme: dark;
+
+  /* Soft LCD black — never pure #000. */
+  --background: #131519;
+  --foreground: #e7eaef;
+
+  /* Neutrals: 50/100/200 darken (fills, borders), 500/600/700/900 lighten
+     (text). slate-300/400 stay as-is because they carry footer and dark
+     panel text; their border uses are re-tuned below. */
+  --color-slate-50: #15181d;
+  --color-slate-100: #20242c;
+  --color-slate-200: #2c313a;
+  --color-slate-500: #8791a2;
+  --color-slate-600: #9ba4b2;
+  --color-slate-700: #c6ccd6;
+  --color-slate-900: #f2f5f9;
+
+  /* SDC red flips to SDC blue. Steps used as fills (50–300 tints, 600/700
+     buttons, 800 hover) stay dark enough for white text; text uses of the
+     same steps are overridden below. */
+  --color-brand-50: #101f36;
+  --color-brand-100: #16294a;
+  --color-brand-200: #1e3a5f;
+  --color-brand-300: #2b4c78;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb;
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e3a8a;
+  --color-brand-900: #172554;
+  --color-brand-950: #0b1220;
+
+  /* Ink blue gets richer for interactive fills. Footer and dark panels keep
+     their own ink-950 navy — deliberately unchanged. ink-600 is text/ring
+     only (event month, badge ring) so it flips light directly. */
+  --color-ink-50: #0f2035;
+  --color-ink-100: #16294a;
+  --color-ink-600: #8fb3d9;
+  --color-ink-800: #1d4470;
+  --color-ink-900: #13304f;
+
+  /* Semantic colours: light tints become dark tints with light text. */
+  --color-red-50: #2a1518;
+  --color-red-200: #7f2d33;
+  --color-red-600: #dc2626; /* hover fill under white text; text use overridden */
+  --color-red-700: #fca5a5;
+  --color-amber-50: #2a2110;
+  --color-amber-200: #7a5a1c;
+  --color-amber-600: #fbbf24;
+  --color-amber-700: #fcd34d;
+  --color-amber-900: #fde68a;
+  --color-green-50: #0f2417;
+  --color-green-200: #166534;
+  --color-green-600: #4ade80;
+  --color-green-700: #86efac;
+  --color-emerald-50: #0d2820;
+  --color-emerald-600: #34d399;
+  --color-emerald-700: #6ee7b7;
+}
+
+.dark ::selection {
+  background-color: #1e3a5f;
+  color: #dbeafe;
+}
+
+/* White cards, sections and panels become an elevated dark surface. The
+   logo chips opt out so the emblem always sits on white. */
+.dark .bg-white:not(.logo-chip) {
+  background-color: #1a1d24;
+}
+.dark .bg-white\/90 {
+  background-color: rgb(26 29 36 / 0.9);
+}
+
+/* Borders whose variables stayed light (slate-300/400 and slate-600 are
+   text colours in the footer and on dark panels) are tuned per-use here. */
+.dark .border-slate-300 {
+  border-color: #363c46;
+}
+.dark .hover\:border-slate-400:hover {
+  border-color: #4a515c;
+}
+.dark .border-slate-600 {
+  border-color: #475569;
+}
+.dark .hover\:border-slate-500:hover {
+  border-color: #8791a2;
+}
+
+/* Hover/focus states restored for rules the unlayered overrides above
+   would otherwise mask. Equal-specificity pairs rely on this order. */
+.dark .hover\:bg-slate-50:hover {
+  background-color: var(--color-slate-50);
+}
+.dark .focus\:border-brand-500:focus {
+  border-color: var(--color-brand-500);
+}
+.dark .hover\:text-white:hover {
+  color: #ffffff;
+}
+
+/* Text roles of variables that were flipped background-first. */
+.dark .text-brand-50 {
+  /* CTA subtitle, sitting on the gradient */
+  color: #dbeafe;
+}
+.dark .text-brand-600 {
+  color: #60a5fa;
+}
+.dark .text-brand-700 {
+  color: #60a5fa;
+}
+.dark .text-brand-800 {
+  color: #bfdbfe;
+}
+.dark .hover\:text-brand-700:hover {
+  color: #93c5fd;
+}
+.dark .group:hover .group-hover\:text-brand-700 {
+  color: #60a5fa;
+}
+.dark .group:hover .group-hover\:text-brand-600 {
+  color: #60a5fa;
+}
+.dark .text-ink-800 {
+  color: #b9cdf0;
+}
+.dark .text-ink-900 {
+  color: #dbe7f5;
+}
+.dark .text-red-600 {
+  color: #f87171;
 }

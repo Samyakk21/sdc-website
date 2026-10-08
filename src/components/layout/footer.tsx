@@ -11,7 +11,6 @@ const pageLinks = [
   { href: "/events", label: "Events" },
   { href: "/cotm", label: "Career of the Month" },
   { href: "/resources", label: "Resources" },
-  { href: "/contact", label: "Contact" },
 ];
 
 export function Footer() {
@@ -21,7 +20,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-white/20">
+              <span className="logo-chip flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-white/20">
                 <LogoMark className="h-8 w-8" />
               </span>
               <span className="text-sm font-bold text-white">{siteName}</span>

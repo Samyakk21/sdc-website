@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X, LogOut } from "lucide-react";
 
 import { Brand } from "@/components/layout/brand";
+import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { signOut } from "@/lib/supabase/actions";
 
 export type NavbarSession = {
@@ -22,8 +23,6 @@ const navLinks = [
   { href: "/resources", label: "Resources" },
 ];
 
-const mobileExtraLinks = [{ href: "/contact", label: "Contact" }];
-
 function initials(name: string | null) {
   const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "U";
@@ -36,8 +35,6 @@ function initials(name: string | null) {
 export function Navbar({ session }: { session: NavbarSession }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-
-  const mobileLinks = [...navLinks, ...mobileExtraLinks];
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -74,6 +71,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
         </ul>
 
         <div className="flex items-center gap-2 justify-self-end">
+          <ThemeToggle />
           {session ? (
             <>
               <Link
@@ -132,7 +130,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
       {open ? (
         <div id="mobile-menu" className="border-t border-slate-200 bg-white lg:hidden">
           <ul className="mx-auto flex w-full max-w-7xl flex-col gap-1 px-4 py-4">
-            {mobileLinks.map((link) => {
+            {navLinks.map((link) => {
               const active = isActive(link.href);
               return (
                 <li key={link.href}>
