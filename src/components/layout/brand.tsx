@@ -5,7 +5,7 @@ import { LogoMark } from "@/components/layout/logo-mark";
 export function Brand({ compact = false }: { compact?: boolean }) {
   return (
     <Link href="/" className="inline-flex items-center gap-2.5" aria-label="Student Development Council – Home">
-      <span className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-slate-200">
+      <span className="logo-chip flex h-9 w-9 items-center justify-center overflow-hidden rounded-lg bg-white ring-1 ring-slate-200">
         <LogoMark className="h-8 w-8" />
       </span>
       {!compact ? (

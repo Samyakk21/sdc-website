@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { aboutStatement, aboutHighlights } from "@/lib/content/initiatives";
+import { contact } from "@/lib/content/site";
 
 export const metadata: Metadata = {
   title: "About",
@@ -57,7 +58,7 @@ export default function AboutPage() {
                 Join an initiative, pitch an idea, or just drop by the SDC Room.
               </p>
             </div>
-            <Button href="/contact" variant="primary" size="md">
+            <Button href={`mailto:${contact.email}`} variant="primary" size="md">
               Contact SDC
             </Button>
           </div>

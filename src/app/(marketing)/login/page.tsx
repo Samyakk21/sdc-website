@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 
 import { Container } from "@/components/ui/container";
 import { getCurrentSession } from "@/lib/auth";
+import { contact } from "@/lib/content/site";
 import { GoogleSignInButton } from "./google-sign-in";
 
 export const metadata: Metadata = {
@@ -64,9 +64,9 @@ export default async function LoginPage({
 
         <p className="mt-6 text-center text-sm text-slate-500">
           Need help?{" "}
-          <Link href="/contact" className="font-medium text-brand-600 hover:text-brand-700">
+          <a href={`mailto:${contact.email}`} className="font-medium text-brand-600 hover:text-brand-700">
             Contact SDC
-          </Link>
+          </a>
         </p>
       </div>
     </Container>

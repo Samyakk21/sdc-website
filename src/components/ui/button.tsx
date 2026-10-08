@@ -37,6 +37,14 @@ export function Button({
   external?: boolean;
 }) {
   const classes = `${variantClasses[variant]} ${sizeClasses[size]} ${className}`;
+  // mailto:/tel: links open in the same tab — render a plain anchor.
+  if (href.startsWith("mailto:") || href.startsWith("tel:")) {
+    return (
+      <a href={href} className={classes}>
+        {children}
+      </a>
+    );
+  }
   if (external) {
     return (
       <a href={href} className={classes} target="_blank" rel="noopener noreferrer">

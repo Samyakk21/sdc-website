@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { contact } from "@/lib/content/site";
 
 export function CtaBand() {
   return (
@@ -14,7 +15,7 @@ export function CtaBand() {
             entrepreneurship, we've got you covered.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Button href="/contact" variant="secondary" size="lg" className="bg-ink-900 hover:bg-ink-800">
+            <Button href={`mailto:${contact.email}`} variant="secondary" size="lg" className="bg-ink-900 hover:bg-ink-800">
               Connect with us
             </Button>
             <Button
@@ -26,6 +27,20 @@ export function CtaBand() {
               Explore opportunities
             </Button>
           </div>
+          <p className="mx-auto mt-6 max-w-2xl text-sm text-white/85">
+            Email us at{" "}
+            <a href={`mailto:${contact.email}`} className="font-medium underline underline-offset-4 hover:text-white">
+              {contact.email}
+            </a>{" "}
+            or call{" "}
+            <a
+              href={`tel:${contact.phone.replace(/\s/g, "")}`}
+              className="font-medium underline underline-offset-4 hover:text-white"
+            >
+              {contact.phone}
+            </a>
+            .
+          </p>
         </div>
       </Container>
     </section>
