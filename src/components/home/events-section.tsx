@@ -24,9 +24,9 @@ export function EventsSection({ events, limit = 3 }: { events: SDCEvent[]; limit
           }
         />
         {visible.length > 0 ? (
-          <ul className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {visible.map((event) => (
-              <li key={event.slug}>
+              <li key={event.slug} className="min-w-0">
                 <EventCard event={event} />
               </li>
             ))}

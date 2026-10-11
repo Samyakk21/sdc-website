@@ -34,19 +34,19 @@ export function AnnouncementsSection({ announcements, limit = 2 }: { announcemen
                 key={announcement.title}
                 className="rounded-xl border border-slate-200 bg-white p-6 transition-shadow hover:shadow-sm"
               >
-                <div className="flex flex-wrap items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2 min-w-0">
                   {announcement.pinned ? (
-                    <Badge tone="brand">
+                    <Badge tone="brand" className="shrink-0">
                       <Pin className="h-3 w-3" aria-hidden />
                       Pinned
                     </Badge>
                   ) : null}
-                  <time className="text-xs text-slate-500" dateTime={announcement.date}>
+                  <time className="text-xs text-slate-500 shrink-0" dateTime={announcement.date}>
                     {formatDate(announcement.date)}
                   </time>
                 </div>
-                <h3 className="mt-2 font-semibold text-slate-900">{announcement.title}</h3>
-                <p className="mt-1 text-sm leading-relaxed text-slate-600">{announcement.body}</p>
+                <h3 className="mt-2 font-semibold text-slate-900 break-words">{announcement.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-slate-600 break-words">{announcement.body}</p>
               </li>
             ))}
           </ul>

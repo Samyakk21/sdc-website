@@ -74,10 +74,10 @@ export default async function DashboardPage() {
             description="Events you've registered for. You'll find details and cancellation here."
           />
           {upcoming.length > 0 ? (
-            <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {upcoming.map((event) => (
-                <li key={event.slug} className="flex">
-                  <div className="w-full">
+                <li key={event.slug} className="flex min-w-0">
+                  <div className="w-full min-w-0">
                     <EventCard event={event} />
                   </div>
                 </li>
@@ -97,10 +97,10 @@ export default async function DashboardPage() {
         {past.length > 0 ? (
           <section>
             <SectionHeading eyebrow="History" title="Events you attended" />
-            <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {past.map((event) => (
-                <li key={event.slug} className="flex">
-                  <div className="w-full">
+                <li key={event.slug} className="flex min-w-0">
+                  <div className="w-full min-w-0">
                     <EventCard event={event} />
                   </div>
                 </li>
@@ -116,10 +116,10 @@ export default async function DashboardPage() {
               title="Available to register"
               description="More sessions you can grab a seat in right now."
             />
-            <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {openEvents.map((event) => (
-                <li key={event.slug} className="flex">
-                  <div className="w-full">
+                <li key={event.slug} className="flex min-w-0">
+                  <div className="w-full min-w-0">
                     <EventCard event={event} />
                   </div>
                 </li>

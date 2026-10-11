@@ -56,9 +56,9 @@ export default async function EventsPage() {
               description="Slots are limited — secure your seat before the deadline."
             />
             {registerNow.length > 0 ? (
-              <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {registerNow.map((event) => (
-                  <li key={event.slug}>
+                  <li key={event.slug} className="min-w-0">
                     <EventCard event={event} />
                   </li>
                 ))}
@@ -112,9 +112,9 @@ export default async function EventsPage() {
                 title="Upcoming events"
                 description="Get these on your calendar before they arrive."
               />
-              <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {comingUp.map((event) => (
-                  <li key={event.slug}>
+                  <li key={event.slug} className="min-w-0">
                     <EventCard event={event} />
                   </li>
                 ))}
@@ -125,9 +125,9 @@ export default async function EventsPage() {
           {past.length > 0 ? (
             <section aria-labelledby="past-heading">
               <SectionHeading id="past-heading" eyebrow="Past" title="Recently ended" />
-              <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {past.map((event) => (
-                  <li key={event.slug}>
+                  <li key={event.slug} className="min-w-0">
                     <EventCard event={event} />
                   </li>
                 ))}
