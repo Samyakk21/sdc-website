@@ -9,6 +9,7 @@ const pageLinks = [
   { href: "/about", label: "About" },
   { href: "/initiatives", label: "Initiatives" },
   { href: "/events", label: "Events" },
+  { href: "/opportunities", label: "Opportunities" },
   { href: "/cotm", label: "Career of the Month" },
   { href: "/resources", label: "Resources" },
 ];

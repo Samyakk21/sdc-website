@@ -32,10 +32,11 @@ Open http://localhost:3000.
 
 ```
 src/
-  app/(marketing)/     Public routes (Home, About, Initiatives, Events, CotM, Resources, Announcements, Contact, Login)
+  app/(marketing)/     Public routes (Home, About, Initiatives, Events, Opportunities, CotM, Resources, Login)
   app/auth/            OAuth callback route handler
   components/          Layout, UI primitives, and feature components
   lib/content/         Seed/static content (mirrors future DB entities)
+  lib/opportunities/   Opportunity submission and voting actions
   lib/supabase/        Server/browser clients, session refresh, sign-out action
   lib/auth.ts          Session + profile helper, role checks
   lib/                 Types, formatters, event-status helpers
@@ -43,6 +44,11 @@ src/
 supabase/migrations/   Versioned SQL (schema, RLS, triggers)
 legacy/                The previous single-page site (HTML export + assets)
 ```
+
+The Opportunities board at `/opportunities` reads shared listings from Supabase.
+Signed-in IISER Bhopal students and admins can post openings and upvote them.
+Apply the `20261016000000_create_opportunities.sql` migration to enable submissions
+and voting; the board remains visible while the database is not configured.
 
 Static seed data in `src/lib/content/` stands in for database rows at this stage. In later phases it is
 replaced by Supabase-backed queries while the public pages remain the same.
