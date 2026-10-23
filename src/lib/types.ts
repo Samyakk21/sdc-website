@@ -25,6 +25,8 @@ export type SDCEvent = {
   date: string;
   startTime?: string;
   endTime?: string;
+  startsAt?: string;
+  endsAt?: string;
   location: string;
   mode: EventMode;
   organizer: string;

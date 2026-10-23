@@ -12,7 +12,7 @@ import { getEventsByTrack } from "@/lib/content/events";
 export const metadata: Metadata = {
   title: "Career of the Month",
   description:
-    "Career of the Month exposes IISER Bhopal students to a career domain through a structured set of events, resources, and activities each month.",
+    "Career of the Month is taking a break this semester and returns in January 2027. The first topic, Bioinformatics, is to be confirmed.",
 };
 
 const steps = [
@@ -47,6 +47,19 @@ export default function CotMPage() {
         title="One field, one month, one structured path"
         description="Each month, Career of the Month takes you deep into a career domain — through events, resources, and activities put together so you actually walk away knowing the field."
       />
+
+      <section className="mt-8 sm:mt-10 rounded-xl border border-amber-200 bg-amber-50 p-6 sm:p-8">
+        <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          Coming January 2027
+        </h2>
+        <p className="mt-3 text-lg text-slate-700 sm:text-xl">
+          Career of the Month is taking a break this semester and returns in
+          January.
+        </p>
+        <p className="mt-2 text-sm text-amber-700">
+          First topic: Bioinformatics — to be confirmed.
+        </p>
+      </section>
 
       <Container className="py-16 sm:py-20">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

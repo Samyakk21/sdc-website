@@ -1,5 +1,5 @@
 # SDC Website — Project State
-**Last Updated:** 2026-10-06
+**Last Updated:** 2026-10-23
 
 ## Project Overview
 - **Project Name:** SDC Website
@@ -51,20 +51,22 @@
 | Google Sign-In + session + logout | Done | Verified live: OAuth → `/auth/callback` → session → navbar signed in; sign-out works. |
 | Role enforcement (admin gate) | Done | Role-based redirect in `proxy.ts`; role auto-assigned from `admin_emails` (super_admin confirmed on first sign-in). |
 | Authentication implementation | Done | End-to-end verified against live project. |
-| Events + registration | Code complete; deployed | Phase 6. Seed migration applied live (8 events + `count_active_registrations` RPC verified via REST); repo lint+build green. Awaiting interactive register→dashboard→cancel browser test. |
-| Superuser event management | Planned (not built) | Plan below; needs scheduling before Phase 8. |
-| CotM v1 | Not started | Phase 7. |
-| Admin interface | Not started | Phase 8. |
+| Events + registration | Code complete; deployed | Phase 6. Seed migration applied live (8 events + `count_active_registrations` RPC verified via REST); repo lint+build green. |
+| Superuser event management | Code complete (Phase 8a) | `/admin/events` list/new/edit/delete with zod validation, slug immutability, hybrid `mode` column, `revalidatePath`. Built on existing `events` RLS admin policies. |
+| CotM v1 | Not started | Phase 7. `/cotm` shows a "Coming January 2027" panel; track lists dormant. |
+| Admin interface | Code complete (Phase 8a) | `requireAdmin()` guard, admin shell (overview + sub-nav), events CRUD, resources CRUD (DB-backed with `is_published` toggle), Admin navbar link (desktop + mobile), `/admin` and `/dashboard` noindex. |
+| Opportunities | On hold | Table + RLS created in migration `20261023000000_admin_foundation.sql`; UI/pages deferred per decision. |
 | Attendance framework | Deferred | Schema-ready only. |
 | Certificates | Deferred | Schema-ready only. |
 
 ## Sitemap (Approved)
 - **Public:** `/` Home, `/about`, `/initiatives`, `/events` (+ `/events/[slug]`, incl. the Announcements section at `/events#announcements`), `/cotm` + `/cotm/[slug]`, `/resources`, `/login`. (`/announcements` is no longer a page — 308-redirects to `/events#announcements`; `/contact` is no longer a page — 308-redirects to `/`, with contact living in the footer and the home CTA's mailto/phone line.)
 - **Student (auth):** `/dashboard`, `/dashboard/events`, `/dashboard/progress`, `/dashboard/profile`.
-- **Admin (auth + role):** `/admin` (events, cotm, resources, announcements, users, settings).
+- **Admin (auth + role):** `/admin` (overview, events, resources), `/admin/events/*`, `/admin/resources/*` — all noindex. `/admin/opportunities` deferred (opportunities on hold).
+- **/opportunities:** on hold — public page + student submissions deferred; table + RLS created in migration `20261023000000_admin_foundation.sql`.
 
 ## Database Entities (conceptual)
-users, roles (via role column on users), events, registrations, attendance (schema-ready, unused), tracks, track_events, track_resources, track_enrollments, progress, resources, announcements, certificates (schema-ready, unused).
+users, roles (via role column on users), events, registrations, attendance (schema-ready, unused), tracks, track_events, track_resources, track_enrollments, progress, resources, announcements, opportunities (table + RLS created; UI on hold), certificates (schema-ready, unused).
 
 ## Proposed Build Order (Phases)
 1. Scaffold Next.js 15 + Tailwind + Supabase client; folder structure; design tokens.
@@ -165,3 +167,15 @@ users, roles (via role column on users), events, registrations, attendance (sche
   - **Home CTA:** "Connect with us" now opens `mailto:sdc@iiserb.ac.in` (`Button` renders `mailto:`/`tel:` hrefs as a plain anchor, no new tab), and a line under the buttons shows the address and the phone `+91 79907 63453` as clickable links.
   - **Dark mode (site-wide):** new `ThemeToggle` switch immediately left of Sign In in the navbar (visible on desktop and mobile top bars; both layouts share the navbar). Built by remapping Tailwind's colour custom properties under `.dark` in `globals.css` — light mode (white + red) is untouched; dark mode flips to soft "LCD black" (`#131519`, never pure black) + SDC blue (brand scale → blue steps, richer ink-blue fills, semantic red/amber/green/emerald → dark tints with light text). Unlayered `.dark` rules handle what one variable can't serve twice: `bg-white` cards → elevated `#1a1d24`, text roles of fill-flipped variables, borders (slate-300/600 stay light because they carry footer/panel text), plus matching hover/focus rules the unlayered overrides would otherwise mask; logo chips carry a `.logo-chip` marker so the emblem always sits on white. No-flash inline script in the root layout `<head>` applies the stored theme (`sdc-theme` in localStorage) before first paint, with `suppressHydrationWarning` on `<html>`; the toggle syncs through `useSyncExternalStore` + MutationObserver. Default is light — no OS-preference sniffing.
   - Verified: lint clean, build green (14 routes — `/contact` gone), local checks — `/contact` 308 → `/`, mailto + phone on home, zero `href="/contact"` anywhere, switch SSR'd in navbar, `dark:` gradient variants sort after their bases in the compiled CSS.
+
+- Admin foundation + public archive (2026-10-23, Phase 8a):
+  - **Admin guard:** `src/lib/admin/guard.ts` `requireAdmin()` checks `users.role in ('admin','super_admin')`; redirects unauthenticated to login and non-admins home. Defense-in-depth on top of `proxy.ts` and RLS.
+  - **Admin shell:** `src/app/admin/layout.tsx` (navbar + footer + admin sub-nav: Overview, Events, Resources) and `src/app/admin/page.tsx` overview (upcoming events, resources, quick actions). All admin routes noindex.
+  - **Events CRUD:** `src/app/admin/events/actions.ts` (`createEvent`/`updateEvent`/`deleteEvent`) with zod validation (required fields, deadline ≤ start, end ≥ start, capacity > 0, URL checks), slug generated from title and immutable on edit, unique-violation surfaced as a field error, create as upcoming with a Registration open toggle → `registration_open`. Pages: `/admin/events` list, `/admin/events/new`, `/admin/events/[slug]/edit`.
+  - **Resources CRUD:** `src/lib/resources-repo.ts` (DB with static fallback), `src/app/admin/resources/actions.ts`, pages `/admin/resources`, `/admin/resources/new`, `/admin/resources/[id]/edit` with `is_published` toggle.
+  - **Navbar:** Admin link added (desktop + mobile) for admin roles, next to Dashboard.
+  - **Event archive:** `/events` now has "Open now" (upcoming + events ended 0–7 days ago) and a "Concluded" section (ended >7 days ago); removed the "Slots are limited" line. Home shows only future events (`isFutureEvent`). `SDCEvent` gained `startsAt`/`endsAt` (timezone-safe ISO from the raw row) via migration `20261023000000_admin_foundation.sql`, which also added the `mode` column ('online'|'offline'|'hybrid') backfilled from `is_online`.
+  - **Live cleanup:** YLAC event set to `completed` (migration `20261023000001_complete_ylac_event.sql`); pinned 7 Oct YLAC announcement removed from `announcements.ts`.
+  - **CoTM:** `/cotm` shows a "Coming January 2027" panel above the explainer steps; metadata updated. Track lists dormant.
+  - **Decisions:** opportunities page/compendiums/announcement admin on hold; single admin role (admins+super_admins treated alike for approve/publish/modify/reject); zod accepted; no separate draft state for events.
+  - Verified: `npm run lint` clean; `npm run build` green.

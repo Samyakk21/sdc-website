@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { EventCard } from "@/components/events/event-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { listEvents } from "@/lib/events-repo";
-import { isEventOpen } from "@/lib/event-status";
+import { eventPhase } from "@/lib/event-status";
 import { announcements } from "@/lib/content/announcements";
 import { formatDate } from "@/lib/format";
 
@@ -22,16 +22,11 @@ export default async function EventsPage() {
 
   const byDate = (a: { date: string }, b: { date: string }) =>
     new Date(a.date).getTime() - new Date(b.date).getTime();
-  const byDateDesc = (a: { date: string }, b: { date: string }) =>
-    new Date(b.date).getTime() - new Date(a.date).getTime();
 
-  const registerNow = events.filter(isEventOpen).sort(byDate);
-  const comingUp = events
-    .filter((event) => event.status === "upcoming")
-    .sort(byDate);
-  const past = events
-    .filter((event) => event.status === "completed" || event.status === "cancelled" || event.status === "registration_closed")
-    .sort(byDateDesc);
+  const openNow = events.filter((e) => eventPhase(e) === "open").sort(byDate);
+  const concluded = events
+    .filter((e) => eventPhase(e) === "finished")
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   const sortedAnnouncements = [...announcements].sort((a, b) => {
     if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
@@ -53,11 +48,11 @@ export default async function EventsPage() {
               id="open-now-heading"
               eyebrow="Open now"
               title="Register for these sessions"
-              description="Slots are limited — secure your seat before the deadline."
+              description="New registrations open when the next session is announced."
             />
-            {registerNow.length > 0 ? (
+            {openNow.length > 0 ? (
               <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {registerNow.map((event) => (
+                {openNow.map((event) => (
                   <li key={event.slug} className="min-w-0">
                     <EventCard event={event} />
                   </li>
@@ -73,6 +68,24 @@ export default async function EventsPage() {
               </div>
             )}
           </section>
+
+          {concluded.length > 0 ? (
+            <section aria-labelledby="concluded-heading">
+              <SectionHeading
+                id="concluded-heading"
+                eyebrow="Concluded"
+                title="Recently concluded"
+                description="Events that wrapped up more than a week ago."
+              />
+              <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {concluded.map((event) => (
+                  <li key={event.slug} className="min-w-0">
+                    <EventCard event={event} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
 
           {sortedAnnouncements.length > 0 ? (
             <section id="announcements" aria-labelledby="announcements-heading">
@@ -101,37 +114,6 @@ export default async function EventsPage() {
                   </li>
                 ))}
               </ol>
-            </section>
-          ) : null}
-
-          {comingUp.length > 0 ? (
-            <section aria-labelledby="coming-up-heading">
-              <SectionHeading
-                id="coming-up-heading"
-                eyebrow="Coming up"
-                title="Upcoming events"
-                description="Get these on your calendar before they arrive."
-              />
-              <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {comingUp.map((event) => (
-                  <li key={event.slug} className="min-w-0">
-                    <EventCard event={event} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {past.length > 0 ? (
-            <section aria-labelledby="past-heading">
-              <SectionHeading id="past-heading" eyebrow="Past" title="Recently ended" />
-              <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {past.map((event) => (
-                  <li key={event.slug} className="min-w-0">
-                    <EventCard event={event} />
-                  </li>
-                ))}
-              </ul>
             </section>
           ) : null}
         </div>

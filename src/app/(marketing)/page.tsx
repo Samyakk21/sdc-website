@@ -7,13 +7,14 @@ import { ResourcesSection } from "@/components/home/resources-section";
 import { AnnouncementsSection } from "@/components/home/announcements-section";
 import { CtaBand } from "@/components/home/cta-band";
 import { listEvents } from "@/lib/events-repo";
+import { isFutureEvent } from "@/lib/event-status";
 import { tracks } from "@/lib/content/tracks";
 import { resources } from "@/lib/content/resources";
 import { announcements } from "@/lib/content/announcements";
 
 export default async function HomePage() {
   const upcomingEvents = (await listEvents())
-    .filter((event) => event.status === "registration_open" || event.status === "upcoming")
+    .filter((event) => isFutureEvent(event))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   const activeTrack = tracks.find((track) => track.status === "active") ?? tracks[0] ?? null;

@@ -16,6 +16,7 @@ import { isEventOpen, currentTimeMs } from "@/lib/event-status";
 export const metadata: Metadata = {
   title: "Dashboard",
   description: "Your events and registrations on the SDC platform.",
+  robots: "noindex",
 };
 
 type RegisteredRow = {

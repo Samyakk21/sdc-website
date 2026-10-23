@@ -14,15 +14,6 @@ export type NavbarSession = {
   role: "student" | "admin" | "super_admin";
 } | null;
 
-const navLinks = [
-  { href: "/about", label: "About" },
-  { href: "/team", label: "Team" },
-  { href: "/initiatives", label: "Initiatives" },
-  { href: "/events", label: "Events" },
-  { href: "/cotm", label: "Career of the Month" },
-  { href: "/resources", label: "Resources" },
-];
-
 function initials(name: string | null) {
   const parts = (name ?? "").trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return "U";
@@ -35,6 +26,20 @@ function initials(name: string | null) {
 export function Navbar({ session }: { session: NavbarSession }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
+  const isAdmin = Boolean(
+    session?.role === "admin" || session?.role === "super_admin",
+  );
+
+  const navLinks = [
+    { href: "/about", label: "About" },
+    { href: "/team", label: "Team" },
+    { href: "/initiatives", label: "Initiatives" },
+    { href: "/events", label: "Events" },
+    { href: "/cotm", label: "Career of the Month" },
+    { href: "/resources", label: "Resources" },
+    ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
+  ];
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
