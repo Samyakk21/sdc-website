@@ -1,4 +1,4 @@
-import type { SDCEvent } from "@/lib/types";
+import type { SDCEvent, EventMode } from "@/lib/types";
 import { events as staticEvents, getEvent as getStaticEvent } from "@/lib/content/events";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
 
@@ -12,6 +12,7 @@ export type EventRow = {
   starts_at: string;
   ends_at: string | null;
   is_online: boolean;
+  mode: string | null;
   location: string | null;
   capacity: number | null;
   registration_deadline: string | null;
@@ -38,6 +39,9 @@ export function toEvent(row: EventRow): SDCEvent {
   const endsAt = row.ends_at ? new Date(row.ends_at) : undefined;
   const deadline = row.registration_deadline ? new Date(row.registration_deadline) : undefined;
 
+  const startsAtISO = startsAt.toISOString();
+  const endsAtISO = endsAt ? endsAt.toISOString() : undefined;
+
   return {
     slug: row.slug,
     title: row.title,
@@ -45,8 +49,10 @@ export function toEvent(row: EventRow): SDCEvent {
     date: istDate(startsAt),
     startTime: istTime(startsAt),
     endTime: endsAt ? istTime(endsAt) : undefined,
+    startsAt: startsAtISO,
+    endsAt: endsAtISO,
     location: row.location ?? (row.is_online ? "Online" : "TBA"),
-    mode: row.is_online ? "online" : "offline",
+    mode: (row.mode ?? (row.is_online ? "online" : "offline")) as EventMode,
     organizer: row.organizer ?? "Student Development Council",
     capacity: row.capacity ?? undefined,
     registrationDeadline: deadline ? istDate(deadline) : undefined,
@@ -60,7 +66,7 @@ async function fetchEvents(): Promise<SDCEvent[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id, slug, title, tagline, description, status, starts_at, ends_at, is_online, location, capacity, registration_deadline, organizer")
+    .select("id, slug, title, tagline, description, status, starts_at, ends_at, is_online, mode, location, capacity, registration_deadline, organizer")
     .order("starts_at", { ascending: true });
 
   if (error || !data) return [];
