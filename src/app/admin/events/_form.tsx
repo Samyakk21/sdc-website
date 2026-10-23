@@ -294,6 +294,16 @@ export function EventForm({ mode, slug, initial }: EventFormProps) {
         </p>
       )}
 
+      {state?.fieldErrors && (
+        <ul className="mt-2 space-y-1 text-xs text-red-600 list-disc pl-5">
+          {Object.entries(state.fieldErrors).flatMap(([field, errors]) =>
+            errors.map((err) => (
+              <li key={`${field}-${err}`}>{err}</li>
+            ))
+          )}
+        </ul>
+      )}
+
       <div className="flex gap-3 pt-4">
         <button
           type="submit"

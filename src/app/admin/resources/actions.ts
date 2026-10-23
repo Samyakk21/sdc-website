@@ -28,7 +28,7 @@ const resourceSchema = z.object({
   category: z.string().optional(),
   url: z.string().url("Enter a valid URL"),
   author: z.string().optional(),
-  isPublished: z.boolean().default(false),
+  isPublished: z.coerce.boolean().default(false),
 });
 
 export async function createResource(
