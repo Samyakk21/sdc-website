@@ -154,7 +154,10 @@ export async function createEvent(
         fieldErrors: { title: ["An event with this title already exists."] },
       };
     }
-    return { ok: false, message: "Couldn't create the event. Please try again." };
+    return {
+      ok: false,
+      message: `Database error: ${error.message} (code: ${error.code})`,
+    };
   }
 
   revalidatePath("/admin/events");
@@ -218,7 +221,10 @@ export async function updateEvent(
     .eq("slug", slug);
 
   if (error) {
-    return { ok: false, message: "Couldn't update the event. Please try again." };
+    return {
+      ok: false,
+      message: `Database error: ${error.message} (code: ${error.code})`,
+    };
   }
 
   revalidatePath(`/admin/events`);
