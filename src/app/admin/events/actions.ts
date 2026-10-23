@@ -42,7 +42,7 @@ const eventSchema = z.object({
     "completed",
     "cancelled",
   ]),
-  registrationOpen: z.boolean().default(false),
+  registrationOpen: z.coerce.boolean().default(false),
 });
 
 function toISTTimestamp(date: string, time?: string) {
