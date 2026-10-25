@@ -36,6 +36,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
     { href: "/team", label: "Team" },
     { href: "/initiatives", label: "Initiatives" },
     { href: "/events", label: "Events" },
+    { href: "/opportunities", label: "Opportunities" },
     { href: "/cotm", label: "Career of the Month" },
     { href: "/resources", label: "Resources" },
     ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),

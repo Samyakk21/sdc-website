@@ -1,5 +1,5 @@
 # SDC Website — Project State
-**Last Updated:** 2026-10-23
+**Last Updated:** 2026-10-25
 
 ## Project Overview
 - **Project Name:** SDC Website
@@ -179,3 +179,7 @@ users, roles (via role column on users), events, registrations, attendance (sche
   - **CoTM:** `/cotm` shows a "Coming January 2027" panel above the explainer steps; metadata updated. Track lists dormant.
   - **Decisions:** opportunities page/compendiums/announcement admin on hold; single admin role (admins+super_admins treated alike for approve/publish/modify/reject); zod accepted; no separate draft state for events.
   - Verified: `npm run lint` clean; `npm run build` green.
+
+- **Project review (2026-10-24):** walked the full repo — `src/app/(marketing)` public pages (Home, About, Initiatives, Events, CotM, Resources, Login, Team), `(dashboard)` dashboard, `admin` area (overview + events/resources CRUD), `auth` callback, `proxy.ts` (Next 16 session refresh + route protection), `src/lib` (events-repo, resources-repo, supabase clients, auth.ts, types, content seed), `supabase/migrations/` (7 migrations incl. `0001_init`, `seed_admin_emails`, `seed_events`, `clear_events`, `seed_ylac_orientation`, `admin_foundation`, `complete_ylac_event`). Confirmed tree matches STATE_updated.md: Phase 4 public site done, Phase 5 auth live, Phase 6 events+registration code complete, Phase 7 CotM v1 not started (Coming January 2027 panel), Phase 8a admin foundation complete and verified. Lint clean; build green.
+
+- **Opportunities page implemented (2026-10-25):** selectively added the opportunities feature from `pr-1` without adopting pr-1's other changes (which delete the admin area, rewrite events/cotm/home/dashboard, simplify event-status/events-repo/types, remove zod). Created: `src/lib/opportunity-types.ts`, `src/lib/opportunities-repo.ts`, `src/lib/opportunities/actions.ts`, `src/components/opportunities/opportunity-card.tsx`, `src/components/opportunities/opportunity-board.tsx`, `src/components/opportunities/opportunity-form.tsx`, `src/app/(marketing)/opportunities/page.tsx`, `supabase/migrations/20261016000000_create_opportunities.sql`. Modified: `src/components/layout/navbar.tsx` (added Opportunities link), `src/components/layout/footer.tsx` (added Opportunities link). Admin area preserved intact. Lint clean (no new issues), type-check clean, production build green — `/opportunities` listed as dynamic route.
