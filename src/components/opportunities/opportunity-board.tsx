@@ -16,10 +16,12 @@ export function OpportunityBoard({
   opportunities,
   isSignedIn,
   status,
+  contributorName,
 }: {
   opportunities: Opportunity[];
   isSignedIn: boolean;
   status: OpportunityBoardStatus;
+  contributorName?: string;
 }) {
   const isAvailable = status === "ready";
   const [selectedDepartments, setSelectedDepartments] = useState<Set<string>>(
@@ -288,7 +290,10 @@ export function OpportunityBoard({
       </div>
 
       {showForm ? (
-        <OpportunityForm onClose={() => setShowForm(false)} />
+        <OpportunityForm
+          contributorName={contributorName}
+          onClose={() => setShowForm(false)}
+        />
       ) : null}
     </>
   );

@@ -46,7 +46,6 @@ export async function createOpportunity(
   const description = String(formData.get("description") ?? "").trim();
   const deadlineValue = String(formData.get("deadline") ?? "").trim();
   const applicationUrl = String(formData.get("application_url") ?? "").trim();
-  const contributorName = String(formData.get("contributor_name") ?? "").trim();
   const tagsRaw = String(formData.get("tags") ?? "").trim();
   const parsedDeadline = deadlineValue
     ? new Date(`${deadlineValue}T00:00:00.000Z`)
@@ -68,9 +67,6 @@ export async function createOpportunity(
   }
   if (description.length < 20 || description.length > 2000) {
     return { ok: false, message: "Description must be between 20 and 2,000 characters." };
-  }
-  if (contributorName.length > 60) {
-    return { ok: false, message: "Contributor name must be 60 characters or fewer." };
   }
   if (
     deadlineValue &&
@@ -107,6 +103,16 @@ export async function createOpportunity(
   }
 
   const supabase = await createClient();
+
+  // Attribution comes from the signed-in account, never from the form. The
+  // submission is also linked by `submitted_by`, so per-user upvote totals can
+  // be aggregated later; the name here is just a display snapshot.
+  const contributorName = (
+    session.profile.full_name?.trim() ||
+    session.profile.email.split("@")[0] ||
+    ""
+  ).slice(0, 60);
+
   const basePayload = {
     title,
     organization,

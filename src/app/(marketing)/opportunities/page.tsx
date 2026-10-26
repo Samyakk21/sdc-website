@@ -17,6 +17,9 @@ export const metadata: Metadata = pageMetadata({
 export default async function OpportunitiesPage() {
   const session = await getCurrentSession();
   const { opportunities, status } = await listOpportunities(session?.profile.id);
+  const contributorName = session
+    ? session.profile.full_name?.trim() || session.profile.email.split("@")[0]
+    : undefined;
 
   return (
     <>
@@ -26,7 +29,12 @@ export default async function OpportunitiesPage() {
         description="Opportunities shared by students, for students. Post a research role, internship, hackathon, job, or fellowship to help your peers."
       />
       <Container className="py-16 sm:py-20">
-        <OpportunityBoard opportunities={opportunities} isSignedIn={Boolean(session)} status={status} />
+        <OpportunityBoard
+          opportunities={opportunities}
+          isSignedIn={Boolean(session)}
+          status={status}
+          contributorName={contributorName}
+        />
       </Container>
     </>
   );

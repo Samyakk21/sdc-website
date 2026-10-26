@@ -13,7 +13,14 @@ import {
   type Department,
 } from "@/lib/opportunity-types";
 
-export function OpportunityForm({ onClose }: { onClose: () => void }) {
+export function OpportunityForm({
+  onClose,
+  contributorName,
+}: {
+  onClose: () => void;
+  /** Display name of the signed-in account, shown so attribution is clear. */
+  contributorName?: string;
+}) {
   const [state, formAction, pending] = useActionState<OpportunityFormState, FormData>(
     createOpportunity,
     null,
@@ -177,20 +184,17 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
               </label>
             </div>
 
-            <label className="block text-sm font-medium text-slate-700">
-              Show your name as contributor{" "}
-              <span className="font-normal text-slate-400">· optional</span>
-              <input
-                name="contributor_name"
-                type="text"
-                maxLength={60}
-                placeholder="e.g. Aditi Sharma or @aditi"
-                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500"
-              />
-              <span className="mt-1 block text-xs font-normal text-slate-500">
-                Leave blank to share anonymously.
-              </span>
-            </label>
+            <p className="rounded-lg bg-slate-50 px-3 py-2.5 text-xs leading-relaxed text-slate-500">
+              {contributorName ? (
+                <>
+                  Posting as{" "}
+                  <span className="font-medium text-slate-700">{contributorName}</span>
+                  . Upvotes count towards your account.
+                </>
+              ) : (
+                "Posts are credited to your SDC account."
+              )}
+            </p>
 
             <div className="space-y-2">
               <label
