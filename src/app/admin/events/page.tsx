@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { deleteEvent } from "@/app/admin/events/actions";
+import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
 import { requireAdmin } from "@/lib/admin/guard";
 import { listEvents } from "@/lib/events-repo";
 import { eventStatusMeta } from "@/lib/event-status";
@@ -98,21 +99,12 @@ export default async function AdminEventsListPage() {
                         </Link>
                         <form action={deleteEvent} className="inline">
                           <input type="hidden" name="slug" value={row.slug} />
-                          <button
-                            type="submit"
+                          <ConfirmSubmitButton
                             className="ml-3 text-sm font-medium text-red-600 hover:text-red-800"
-                            onClick={(e) => {
-                              if (
-                                !window.confirm(
-                                  `Delete “${row.title}”? This cannot be undone.`,
-                                )
-                              ) {
-                                e.preventDefault();
-                              }
-                            }}
+                            message={`Delete “${row.title}”? This cannot be undone.`}
                           >
                             Delete
-                          </button>
+                          </ConfirmSubmitButton>
                         </form>
                       </td>
                     </tr>

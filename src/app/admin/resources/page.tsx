@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { deleteResource } from "@/app/admin/resources/actions";
+import { ConfirmSubmitButton } from "@/components/admin/confirm-submit-button";
 import { requireAdmin } from "@/lib/admin/guard";
 import { listAdminResources } from "@/lib/resources-repo";
 
@@ -86,21 +87,12 @@ export default async function AdminResourcesListPage() {
                       </Link>
                       <form action={deleteResource} className="inline">
                         <input type="hidden" name="id" value={row.id} />
-                        <button
-                          type="submit"
+                        <ConfirmSubmitButton
                           className="ml-3 text-sm font-medium text-red-600 hover:text-red-800"
-                          onClick={(e) => {
-                            if (
-                              !window.confirm(
-                                `Delete “${row.title}”? This cannot be undone.`,
-                              )
-                            ) {
-                              e.preventDefault();
-                            }
-                          }}
+                          message={`Delete “${row.title}”? This cannot be undone.`}
                         >
                           Delete
-                        </button>
+                        </ConfirmSubmitButton>
                       </form>
                     </td>
                   </tr>
