@@ -13,6 +13,9 @@ import { getTrack } from "@/lib/content/tracks";
 import { getCurrentSession } from "@/lib/auth";
 import { eventStatusMeta, isDeadlinePast, isEventOpen } from "@/lib/event-status";
 import { formatDate, formatTime } from "@/lib/format";
+import { JsonLd } from "@/components/seo/json-ld";
+import { pageMetadata } from "@/lib/seo";
+import { eventStructuredData } from "@/lib/structured-data";
 
 /** Renders a description keeping its line breaks and turning URLs into links. */
 function renderDescription(text: string) {
@@ -37,10 +40,15 @@ export function generateMetadata({ params }: PageProps<"/events/[slug]">): Promi
   return params.then(async ({ slug }) => {
     const event = await getEvent(slug);
     if (!event) return {};
-    return {
+    const description =
+      event.description.split("\n")[0].trim().slice(0, 160) ||
+      `${event.title} — an SDC event at IISER Bhopal.`;
+    return pageMetadata({
       title: event.title,
-      description: event.description,
-    };
+      description,
+      path: `/events/${event.slug}`,
+      openGraph: { type: "article" },
+    });
   });
 }
 
@@ -139,6 +147,7 @@ export default async function EventPage({ params }: PageProps<"/events/[slug]">)
 
   return (
     <Container className="py-12 sm:py-16">
+      <JsonLd data={eventStructuredData(event)} />
       <Link
         href="/events"
         className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-brand-700"

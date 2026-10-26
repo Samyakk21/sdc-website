@@ -5,11 +5,14 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { aboutStatement, aboutHighlights } from "@/lib/content/initiatives";
 import { contact } from "@/lib/content/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "About",
-  description: "Learn what the Student Development Council is and what it does for students at IISER Bhopal.",
-};
+  description:
+    "Learn what the Student Development Council is and what it does for students at IISER Bhopal.",
+  path: "/about",
+});
 
 export default function AboutPage() {
   return (

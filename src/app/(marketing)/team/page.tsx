@@ -5,11 +5,14 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { TeamCard } from "@/components/team/team-card";
 import { teamGroups } from "@/lib/content/team";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Team",
-  description: "Meet the Student Development Council team at IISER Bhopal — the faculty and student members running SDC initiatives.",
-};
+  description:
+    "Meet the Student Development Council team at IISER Bhopal — the faculty and student members running SDC initiatives.",
+  path: "/team",
+});
 
 export default function TeamPage() {
   return (

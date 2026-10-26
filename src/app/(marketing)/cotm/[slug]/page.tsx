@@ -12,6 +12,7 @@ import { ResourceCard } from "@/components/resources/resource-card";
 import { getTrack } from "@/lib/content/tracks";
 import { getEventsByTrack } from "@/lib/content/events";
 import { resources } from "@/lib/content/resources";
+import { absoluteUrl, socialImage } from "@/lib/seo";
 
 export async function generateMetadata({ params }: PageProps<"/cotm/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -20,6 +21,14 @@ export async function generateMetadata({ params }: PageProps<"/cotm/[slug]">): P
   return {
     title: track.title,
     description: track.tagline,
+    alternates: { canonical: absoluteUrl(`/cotm/${track.slug}`) },
+    openGraph: {
+      type: "article",
+      title: `${track.title} | Career of the Month`,
+      description: track.tagline,
+      url: absoluteUrl(`/cotm/${track.slug}`),
+      images: [socialImage],
+    },
   };
 }
 

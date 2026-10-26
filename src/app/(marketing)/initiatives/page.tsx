@@ -4,11 +4,13 @@ import { ArrowUpRight } from "lucide-react";
 import { PageHeader } from "@/components/ui/page-header";
 import { Container } from "@/components/ui/container";
 import { initiatives } from "@/lib/content/initiatives";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Initiatives",
   description: "Explore the initiatives run by the Student Development Council at IISER Bhopal.",
-};
+  path: "/initiatives",
+});
 
 export default function InitiativesPage() {
   return (

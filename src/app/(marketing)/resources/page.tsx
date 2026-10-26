@@ -7,12 +7,14 @@ import { ResourceBrowser } from "@/components/resources/resource-browser";
 import { CompendiumSection } from "@/components/resources/compendium-section";
 import { resources } from "@/lib/content/resources";
 import { compendiums } from "@/lib/content/compendiums";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Resources",
   description:
     "Internship compendiums, roadmaps, guides, articles, videos, and curated links maintained by the Student Development Council.",
-};
+  path: "/resources",
+});
 
 export default function ResourcesPage() {
   return (

@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import { TrackCard } from "@/components/cotm/track-card";
 import { tracks } from "@/lib/content/tracks";
 import { getEventsByTrack } from "@/lib/content/events";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Career of the Month",
   description:
     "Career of the Month is starting in January 2027. The first topic, Bioinformatics, is to be confirmed.",
-};
+  path: "/cotm",
+});
 
 const steps = [
   {

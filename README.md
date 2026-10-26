@@ -57,6 +57,7 @@ Copy `.env.example` to `.env.local` and fill in values from your Supabase projec
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key (safe for browsers) |
 | `NEXT_PUBLIC_SITE_URL` | Public origin (local: `http://localhost:3000`) |
+| `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | Optional Search Console verification token |
 
 Without these the public website still builds and renders; authenticated routes
 simply report no session, and the auth flows activate once credentials are set.

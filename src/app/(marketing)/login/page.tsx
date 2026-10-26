@@ -5,13 +5,16 @@ import { ShieldCheck } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { getCurrentSession } from "@/lib/auth";
 import { contact } from "@/lib/content/site";
+import { pageMetadata } from "@/lib/seo";
 import { GoogleSignInButton } from "./google-sign-in";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Sign In",
   description:
     "Sign in to the Student Development Council platform with your IISER Bhopal Google account.",
-};
+  path: "/login",
+  noIndex: true,
+});
 
 export default async function LoginPage({
   searchParams,

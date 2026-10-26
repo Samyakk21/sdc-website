@@ -10,12 +10,15 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { listEvents } from "@/lib/events-repo";
 import { eventPhase } from "@/lib/event-status";
 import { announcements } from "@/lib/content/announcements";
+import { pageMetadata } from "@/lib/seo";
 import { formatDate } from "@/lib/format";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Events",
-  description: "Upcoming events, workshops, and sessions from the Student Development Council at IISER Bhopal.",
-};
+  description:
+    "Upcoming events, workshops, and sessions from the Student Development Council at IISER Bhopal.",
+  path: "/events",
+});
 
 export default async function EventsPage() {
   const events = await listEvents();

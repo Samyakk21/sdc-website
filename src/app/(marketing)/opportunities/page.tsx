@@ -5,12 +5,14 @@ import { Container } from "@/components/ui/container";
 import { OpportunityBoard } from "@/components/opportunities/opportunity-board";
 import { listOpportunities } from "@/lib/opportunities-repo";
 import { getCurrentSession } from "@/lib/auth";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Opportunities",
   description:
     "Student-shared research roles, internships, hackathons, jobs, and fellowships for the IISER Bhopal community.",
-};
+  path: "/opportunities",
+});
 
 export default async function OpportunitiesPage() {
   const session = await getCurrentSession();

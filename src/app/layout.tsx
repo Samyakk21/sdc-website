@@ -1,8 +1,11 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
-import { siteDescription } from "@/lib/content/site";
+import { JsonLd } from "@/components/seo/json-ld";
+import { siteName } from "@/lib/content/site";
+import { homeMetadata, siteUrl, titleSuffix } from "@/lib/seo";
+import { siteStructuredData } from "@/lib/structured-data";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,43 +17,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://sdc-website-ten-umber.vercel.app"
-).replace(/\/$/, "");
-
 export const metadata: Metadata = {
+  ...homeMetadata(),
   metadataBase: new URL(siteUrl),
   title: {
-    default: "SDC | Student Development Council",
-    template: "%s | Student Development Council",
+    default: "Student Development Council (SDC), IISER Bhopal",
+    template: `%s | ${titleSuffix}`,
   },
-  description: siteDescription,
+  applicationName: siteName,
+  authors: [{ name: siteName, url: siteUrl }],
+  creator: siteName,
+  publisher: siteName,
+  category: "education",
+  formatDetection: { telephone: false },
+  ...(process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION } }
+    : {}),
+};
+
+export const viewport: Viewport = {
   themeColor: "#0b2438",
-  openGraph: {
-    title: "Student Development Council",
-    description: siteDescription,
-    url: siteUrl,
-    siteName: "Student Development Council",
-    images: [
-      {
-        url: `${siteUrl}/images/sdc-hero.jpeg`,
-        width: 1402,
-        height: 1404,
-        alt: "Student Development Council",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    images: [`${siteUrl}/images/sdc-hero.jpeg`],
-  },
+  colorScheme: "light dark",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
+      lang="en-IN"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
@@ -61,6 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             __html: `(function(){try{if(localStorage.getItem("sdc-theme")==="dark"){document.documentElement.classList.add("dark")}}catch(e){}})();`,
           }}
         />
+        <JsonLd data={siteStructuredData()} />
       </head>
       <body className="flex min-h-full flex-col">
         <a
