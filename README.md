@@ -86,6 +86,39 @@ simply report no session, and the auth flows activate once credentials are set.
 - Roles: `student`, `admin`, `super_admin`. Roles are assigned automatically at
   account creation based on the `admin_emails` allowlist.
 
+### Managing admins
+
+Two tables are involved and both must agree:
+
+- `admin_emails` — the allowlist read by the sign-up trigger.
+- `users.role` — what the app checks on every request.
+
+Promote someone (run in the SQL editor):
+
+```sql
+with target as (
+  insert into public.admin_emails (email, role)
+  values ('someone@iiserb.ac.in', 'admin')  -- or 'super_admin'
+  on conflict (email) do update set role = excluded.role
+  returning email, role
+)
+update public.users u set role = target.role
+from target
+where u.email = target.email;
+```
+
+Demote:
+
+```sql
+delete from public.admin_emails where email = 'someone@iiserb.ac.in';
+update public.users set role = 'student' where email = 'someone@iiserb.ac.in';
+```
+
+Only super admins can change `users.role` through the API
+(`20261026000200_guard_role_changes.sql`). Direct SQL and the service role
+remain trusted so the allowlist and sign-up trigger can still assign roles.
+
+
 ## Where auth/schema code lives
 
 - `src/lib/supabase/` — server/browser clients, session-refresh logic
