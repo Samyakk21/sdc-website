@@ -9,7 +9,13 @@ import {
 } from "@/lib/opportunities/actions";
 import { departments, type Department } from "@/lib/opportunity-types";
 
-export function OpportunityForm({ onClose }: { onClose: () => void }) {
+export function OpportunityForm({
+  onClose,
+  availableTags = [],
+}: {
+  onClose: () => void;
+  availableTags?: string[];
+}) {
   const [state, formAction, pending] = useActionState<OpportunityFormState, FormData>(
     createOpportunity,
     null,
@@ -22,6 +28,8 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
   const [tags, setTags] = useState<string[]>([]);
   const [departmentMenuOpen, setDepartmentMenuOpen] = useState(false);
   const departmentMenuRef = useRef<HTMLDivElement>(null);
+  const [tagMenuOpen, setTagMenuOpen] = useState(false);
+  const tagMenuRef = useRef<HTMLDivElement>(null);
 
   // Close the department dropdown when clicking outside or pressing Escape.
   useEffect(() => {
@@ -48,6 +56,28 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
     };
   }, [departmentMenuOpen]);
 
+  // Close the tag dropdown when clicking outside or pressing Escape.
+  useEffect(() => {
+    if (!tagMenuOpen) return;
+
+    function handlePointerDown(event: MouseEvent) {
+      if (tagMenuRef.current && !tagMenuRef.current.contains(event.target as Node)) {
+        setTagMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setTagMenuOpen(false);
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [tagMenuOpen]);
+
   function toggleDepartment(department: Department) {
     const next = new Set(selectedDepartments);
     if (next.has(department)) next.delete(department);
@@ -68,6 +98,18 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
   function removeTag(tag: string) {
     setTags(tags.filter((t) => t !== tag));
   }
+
+  function toggleTag(tag: string) {
+    if (tags.includes(tag)) {
+      setTags(tags.filter((t) => t !== tag));
+      return;
+    }
+    if (tags.length >= 5 || tag.length > 30) return;
+    setTags([...tags, tag]);
+  }
+
+  // Existing tags from the board plus anything already selected locally.
+  const tagOptions = Array.from(new Set([...availableTags, ...tags])).sort();
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/55 p-0 backdrop-blur-sm sm:items-center sm:p-6">
@@ -123,6 +165,8 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
                 value={department}
               />
             ))}
+            {/* Selected tags are submitted as a comma-separated list. */}
+            <input type="hidden" name="tags" value={tags.join(",")} />
 
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block text-sm font-medium text-slate-700">
@@ -237,55 +281,132 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
               ) : null}
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="space-y-2">
               <label className="block text-sm font-medium text-slate-700">
-                Application deadline <span className="font-normal text-slate-400">· optional</span>
-                <input
-                  name="deadline"
-                  type="date"
-                  className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500"
-                />
+                Application deadline{" "}
+                <span className="font-normal text-slate-400">· optional</span>
               </label>
-              <label className="block text-sm font-medium text-slate-700">
-                Tags
-                <input
-                  name="tags"
-                  type="text"
-                  value={tagInput}
-                  onChange={(event) => setTagInput(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === ",") {
-                      event.preventDefault();
-                      addTag();
-                    }
-                  }}
-                  placeholder="e.g. research, paid, summer"
-                  className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500"
-                />
-              </label>
+              <input
+                name="deadline"
+                type="date"
+                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500 sm:max-w-xs"
+              />
             </div>
 
-            {tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs font-medium text-slate-500">Selected tags:</span>
-                {tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      aria-label={`Remove tag ${tag}`}
-                      className="rounded-full p-0.5 text-brand-600 hover:bg-brand-100"
-                    >
-                      <X className="h-3 w-3" aria-hidden />
-                    </button>
+            <div className="space-y-2">
+              <label
+                htmlFor="tag-select"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Tags{" "}
+                <span className="font-normal text-slate-400">
+                  · select existing or add your own
+                </span>
+              </label>
+              <div className="relative" ref={tagMenuRef}>
+                <button
+                  id="tag-select"
+                  type="button"
+                  onClick={() => setTagMenuOpen((open) => !open)}
+                  aria-haspopup="listbox"
+                  aria-expanded={tagMenuOpen}
+                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-left text-sm transition-colors hover:border-brand-500 focus:border-brand-500"
+                >
+                  <span className={tags.length > 0 ? "text-slate-900" : "text-slate-400"}>
+                    {tags.length === 0
+                      ? "Select or add tags"
+                      : `${tags.length} tag${tags.length === 1 ? "" : "s"} selected`}
                   </span>
-                ))}
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${
+                      tagMenuOpen ? "rotate-180" : ""
+                    }`}
+                    aria-hidden
+                  />
+                </button>
+
+                {tagMenuOpen ? (
+                  <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
+                    <div
+                      role="listbox"
+                      aria-multiselectable="true"
+                      aria-label="Tags"
+                      className="max-h-48 overflow-y-auto p-1"
+                    >
+                      {tagOptions.length === 0 ? (
+                        <p className="px-3 py-2 text-xs text-slate-500">
+                          No tags yet — add the first one below.
+                        </p>
+                      ) : (
+                        tagOptions.map((tag) => {
+                          const active = tags.includes(tag);
+                          return (
+                            <label
+                              key={tag}
+                              className="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={active}
+                                onChange={() => toggleTag(tag)}
+                                className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                              />
+                              {tag}
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 border-t border-slate-100 p-2">
+                      <input
+                        type="text"
+                        value={tagInput}
+                        onChange={(event) => setTagInput(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === ",") {
+                            event.preventDefault();
+                            addTag();
+                          }
+                        }}
+                        maxLength={30}
+                        placeholder="Add a new tag"
+                        aria-label="Add a new tag"
+                        className="min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-2.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={addTag}
+                        className="shrink-0 rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
               </div>
-            )}
+
+              {tags.length > 0 ? (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700"
+                    >
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        aria-label={`Remove tag ${tag}`}
+                        className="rounded-full p-0.5 text-brand-600 hover:bg-brand-100"
+                      >
+                        <X className="h-3 w-3" aria-hidden />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+              <p className="text-xs text-slate-500">Up to 5 tags, 30 characters each.</p>
+            </div>
 
             <div className="space-y-3">
               <label className="block text-sm font-medium text-slate-700">

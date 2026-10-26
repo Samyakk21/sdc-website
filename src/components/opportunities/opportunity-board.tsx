@@ -7,11 +7,7 @@ import { ArrowDownWideNarrow, ArrowUpWideNarrow, Plus, Search, Sparkles } from "
 import { EmptyState } from "@/components/ui/empty-state";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { OpportunityForm } from "@/components/opportunities/opportunity-form";
-import {
-  departments,
-  type Department,
-  type Opportunity,
-} from "@/lib/opportunity-types";
+import { departments, type Opportunity } from "@/lib/opportunity-types";
 import type { OpportunityBoardStatus } from "@/lib/opportunities-repo";
 
 type SortMode = "popular" | "newest" | "deadline";
@@ -291,7 +287,12 @@ export function OpportunityBoard({
         )}
       </div>
 
-      {showForm ? <OpportunityForm onClose={() => setShowForm(false)} /> : null}
+      {showForm ? (
+        <OpportunityForm
+          onClose={() => setShowForm(false)}
+          availableTags={allTags}
+        />
+      ) : null}
     </>
   );
 }
