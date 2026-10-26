@@ -107,7 +107,7 @@ export async function createOpportunity(
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.from("opportunities").insert({
+  const basePayload = {
     title,
     organization,
     department: selectedDepartments,
@@ -115,9 +115,24 @@ export async function createOpportunity(
     deadline: deadlineValue || null,
     application_url: applicationUrlValue.toString(),
     submitted_by: session.profile.id,
-    contributor_name: contributorName || null,
     tags: uniqueTags,
-  });
+  };
+
+  let { error } = await supabase
+    .from("opportunities")
+    .insert({ ...basePayload, contributor_name: contributorName || null });
+
+  // The contributor column ships in its own migration; if it isn't applied yet
+  // still accept the post rather than failing the whole form.
+  if (
+    error?.code === "42703" &&
+    /contributor_name/.test(error.message ?? "")
+  ) {
+    console.warn(
+      "opportunities.contributor_name is missing; saving without it. Apply supabase/migrations/20261026000100_opportunity_contributor.sql.",
+    );
+    ({ error } = await supabase.from("opportunities").insert(basePayload));
+  }
 
   if (error) {
     console.error("Could not create opportunity:", error);

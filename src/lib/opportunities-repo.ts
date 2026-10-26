@@ -18,6 +18,20 @@ function isMissingSchemaError(code: string | undefined): boolean {
   return code ? missingSchemaErrorCodes.has(code) : false;
 }
 
+const opportunityColumns =
+  "id, title, organization, department, description, deadline, application_url, submitted_by, upvote_count, created_at, tags";
+
+const opportunityColumnsWithContributor = `${opportunityColumns}, contributor_name`;
+
+/**
+ * Column added by 20261026000100_opportunity_contributor.sql. When it is
+ * missing we keep the board usable (contributor names just stay blank)
+ * instead of blanking the whole page behind a setup notice.
+ */
+function isMissingContributorColumn(error: { code?: string; message?: string } | null) {
+  return error?.code === "42703" && /contributor_name/.test(error.message ?? "");
+}
+
 export async function listOpportunities(
   userId?: string,
 ): Promise<{ opportunities: Opportunity[]; status: OpportunityBoardStatus }> {
@@ -26,12 +40,19 @@ export async function listOpportunities(
   }
 
   const supabase = await createClient();
-  const opportunitiesResult = await supabase
-    .from("opportunities")
-    .select(
-      "id, title, organization, department, description, deadline, application_url, submitted_by, contributor_name, upvote_count, created_at, tags",
-    )
-    .order("created_at", { ascending: false });
+  const fetchRows = (columns: string) =>
+    supabase.from("opportunities").select(columns).order("created_at", { ascending: false });
+
+  let opportunitiesResult = await fetchRows(opportunityColumnsWithContributor);
+  let hasContributorColumn = true;
+
+  if (isMissingContributorColumn(opportunitiesResult.error)) {
+    hasContributorColumn = false;
+    console.warn(
+      "opportunities.contributor_name is missing; apply supabase/migrations/20261026000100_opportunity_contributor.sql to show contributor names.",
+    );
+    opportunitiesResult = await fetchRows(opportunityColumns);
+  }
 
   if (opportunitiesResult.error) {
     if (isMissingSchemaError(opportunitiesResult.error.code)) {
@@ -59,10 +80,10 @@ export async function listOpportunities(
   }
 
   return {
-    opportunities: ((opportunitiesResult.data ?? []) as OpportunityRow[]).map((opportunity) => ({
+    opportunities: ((opportunitiesResult.data ?? []) as unknown as OpportunityRow[]).map((opportunity) => ({
       ...opportunity,
       department: Array.isArray(opportunity.department) ? opportunity.department : [],
-      contributor_name: opportunity.contributor_name ?? null,
+      contributor_name: hasContributorColumn ? opportunity.contributor_name ?? null : null,
       tags: Array.isArray(opportunity.tags) ? opportunity.tags : [],
       has_upvoted: votedIds.has(opportunity.id),
     })),
