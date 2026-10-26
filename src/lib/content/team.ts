@@ -20,7 +20,12 @@ export const teamGroups: TeamGroup[] = [
   {
     title: "Student Advisor",
     members: [
-      t("Manas Nandan", "Student Advisor", "/images/team/manas.jpg", {
+      t("Sidharth Raman", "Student Advisor", "/images/team/sidharth.png", {
+        quote: "I overthink everything - mostly on purpose",
+        linkedin: "https://www.linkedin.com/in/sid-raman/",
+        email: "manas22@iiserb.ac.in",
+      }),
+      t("Dhani", "Student Advisor", "/images/team/manas.jpg", {
         quote: "I overthink everything - mostly on purpose",
         linkedin: "https://www.linkedin.com/in/manas-nandan/",
         email: "manas22@iiserb.ac.in",
@@ -30,105 +35,84 @@ export const teamGroups: TeamGroup[] = [
   {
     title: "Secretary",
     members: [
-      t("Shlok Saraf", "Secretary", "/images/team/shlok-2.jpeg", {
-        quote: "Confuse the confused",
-        linkedin: "https://www.linkedin.com/in/shlok-saraf-ss2407/",
-        email: "shloks23@iiserb.ac.in",
-      }),
-    ],
-  },
-  {
-    title: "Vice Secretaries",
-    members: [
-      t("Anuj Wani", "Vice Secretary", "/images/team/anuj.jpg", {
-        quote: "Figuring out how to figure out!",
-        linkedin: "https://www.linkedin.com/in/anuj--wani",
-        email: "wani23@iiserb.ac.in",
-      }),
-      t("Mattupalli Karthik", "Vice Secretary", "/images/team/karthik.jpg", {
-        quote: "Supporting Operations, Coordination, and Smooth Execution of Initiatives.",
+      t("Mattupalli Karthik", "Secretary", "/images/team/karthik.jpg", {
+        quote: "Give yourself a pat on your back whenever you good.",
         linkedin: "https://www.linkedin.com/in/karthikmattupalli/",
         email: "mattupalli24@iiserb.ac.in",
       }),
     ],
   },
   {
-    title: "Core Committee",
+    title: "OVERSEERS",
     members: [
-      t("Vansh Mangal", "Operations and Logistics", "/images/team/vansh.jpg", {
-        quote: "My identity is limited to being a student of IISER Bhopal.",
-        linkedin: "https://www.linkedin.com/in/vanshmangal",
-        email: "vanshm24@iiserb.ac.in",
+      t("Samyak", "TECH Wing", "/images/team/samyak.jpg", {
+        quote: "Figuring out how to figure out!",
+        linkedin: "https://www.linkedin.com/in/samyak07/",
+        email: "samyak25@iiserb.ac.in",
       }),
-      t("Aarush Rajan Ranjan", "Ideas, Managing Events and Teams", "/images/team/aarush.jpeg", {
-        quote: "To be or not to be that is the question",
-        linkedin: "https://www.linkedin.com/in/aarushrajanranjan/",
-        email: "aarush24@iiserb.ac.in",
+      t("Ishika Ashish", "Design", "/images/team/ishika2.jpg", {
+        quote: "Supporting Operations, Coordination, and Smooth Execution of Initiatives.",
+        linkedin: "https://www.linkedin.com/in/ishika-ashish-a01389373/",
+        email: "mattupalli24@iiserb.ac.in",
       }),
-      t("Madhav", "General Manager", "/images/team/madhav.jpeg", {
-        quote: "Hahhahaha",
-        linkedin: "https://www.linkedin.com/in/madhav-69141b326/",
-        email: "madhav24@iiserb.ac.in",
+      t("Angel ", "Information and PR", "/images/team/angel.jpg", {
+        quote: "I like cells and stars.",
+        linkedin: "https://www.linkedin.com/in/karthikmattupalli/",
+        email: "mattupalli24@iiserb.ac.in",
       }),
-      t("Divyam Sood", "Core Committee", "/images/team/divyam.jpeg", {
-        quote: "Ask no questions and you'll be told no lies.",
-        email: "divyam23@iiserb.ac.in",
+      t("AARUSHI BHATTACHARYA", "YLAC", "/images/team/aarushi2.jpeg", {
+        quote: "In pursuit of the interesting.",
+        linkedin: "https://www.linkedin.com/in/aarushi-244bb5382/",
+        email: "mattupalli24@iiserb.ac.in",
       }),
-      t("Tirth Shah", "Web and PR", "/images/team/tirth.png", {
-        quote: "coffee is the answer to all my questions",
-        linkedin: "https://www.linkedin.com/in/tirth-shah-iiserb",
-        email: "shah24@iiserb.ac.in",
-      }),
-      t("Suryansh Upadhyay", "Developer and Core", "/images/team/suri-2.png", {
-        quote: "operating on diluted felix felicis",
-        email: "suryansh24@iiserb.ac.in",
-      }),
-      t("Tejas Hadas", "Social Media Head", "/images/team/tejas.jpg", {
-        quote: "Trying to balance my CPI, my K/D ratio, and my carbon footprint.",
-        email: "hadas24@iiserb.ac.in",
-      }),
-      t("Drishti Mishra", "Social Media and PR", "/images/team/drishti.jpeg", {
-        quote: "Trying to figure out life with puppy face.",
-        linkedin: "https://www.linkedin.com/in/drishti-mishra-2b0900394/",
-        email: "drishti24@iiserb.ac.in",
-      }),
-      t("Anshika Joshi", "Design and Content", "/images/team/anshika.jpeg", {
-        quote: "slightly addicted to CANVA",
-        linkedin: "https://www.linkedin.com/in/anshika-joshi-6161a7323/",
-        email: "anshikaj24@iiserb.ac.in",
-      }),
-      t("Abhishek Sikarwar", "Outreach and PR", "/images/team/abhishek.jpeg", {
-        quote: "Graceful exterior, Powerful Interior",
-        linkedin: "https://www.linkedin.com/in/abhishek-sikarwar-55b80b325/",
-        email: "asikarwar24@iiserb.ac.in",
-      }),
-      t("Mahi Singh", "PR and Content", "/images/team/mahi.jpg", {
-        quote: "Powered by curiosity and a questionable sleep schedule.",
-        linkedin: "https://www.linkedin.com/in/mahi-singh-4b093b32b",
-        email: "mahi24@iiserb.ac.in",
-      }),
-      t("Arpit Shrivastav", "Tech and PR", "/images/team/arpit.jpeg", {
-        quote: "Tech & PR core member — building solutions and driving outreach for SDC initiatives.",
-        linkedin: "https://www.linkedin.com/in/arpitshrivastaw",
-        email: "arpit24@iiserb.ac.in",
-      }),
-      t("Shivam Verma", "Social Media", "/images/team/shivam.jpg", {
-        linkedin: "https://www.linkedin.com/in/shivam-verma-098b4b340/",
-        email: "shivamv24@iiserb.ac.in",
-      }),
-      t("Archit Khare", "Core Committee", "/images/team/archit.jpg", {
-        quote: "I started to attend the meetings",
-        linkedin: "https://www.linkedin.com/in/archit-khare-7114ba268/",
-        email: "architk24@iiserb.ac.in",
-      }),
-      t("Dishank K", "PR and Mining", "/images/team/dishank.jpeg", {
+      t("DISHANK K", "E-CELL", "/images/team/dishank.jpeg", {
         quote: "Slightly unhinged, mostly intentional",
-        linkedin: "https://www.linkedin.com/in/dishank-k-6137b132a/",
+        linkedin: "https://www.linkedin.com/in/karthikmattupalli/",
         email: "dishank24@iiserb.ac.in",
       }),
     ],
   },
   {
+    title: "Core Committee",
+    members: [
+      t("Raman Ghame", "PR and Content", "/images/team/raman.JPG", {
+        quote: "Slightly unhinged, mostly intentional",
+        linkedin: "https://www.linkedin.com/in/raman-ghame-a33014329/",
+        email: "raman24@iiserb.ac.in",
+      }),
+      t("Sanjay Swaminathan", "PR", "/images/team/sanjay.jpg", {
+        quote: "Somewhere between asking why and figuring out how",
+        linkedin: "https://www.linkedin.com/in/sanjay-swaminathan-8b1076393/",
+        email: "sanjay25@iiserb.ac.in",
+      }),
+      t("Sant Solanki", "Operations and PR", "/images/team/sant.jpg", {
+        quote: "Take my advice — I'm not using it.",
+        linkedin: "https://www.linkedin.com/in/sant-solanki-7bb548393/",
+        email: "sant25@iiserb.ac.in",
+      }),
+      t("Arko Banerjee", "YLAC", "/images/team/arko.jpg", {
+        quote: "Recently i have decided to do more of nothing",
+        linkedin: "https://www.linkedin.com/in/arko-banerjee-547497386/",
+        email: "arko25@iiserb.ac.in",
+      }),
+      t("Amritash", "Tech and Design", "/images/team/amritash.jpg", {
+        quote: "My talent is currently under maintenance",
+        linkedin: "https://www.linkedin.com/in/amritash-mishra/",
+        email: "amritash25@iiserb.ac.in",
+      }),
+      t("Naman Kanyal", "Tech", "/images/team/naman.jpg", {
+        quote: "Master of none, Larper of all!",
+        linkedin: "https://www.linkedin.com/in/naman-kanyal-b2709b431/",
+        email: "naman25@iiserb.ac.in",
+      }),
+      t("Vedant Bhagat", "PR", "/images/team/vedant.jpg", {
+        quote: "Learning how to learn",
+        linkedin: "https://www.linkedin.com/in/vedant-bhagat-950150371/",
+        email: "vedantb25@iiserb.ac.in",
+      }),
+    ],
+  },
+  /*{
     title: "Trainee Team",
     members: [
       t("Aarushi Bhattacharya", "Trainee", "/images/team/aarushi.png", {
@@ -161,4 +145,5 @@ export const teamGroups: TeamGroup[] = [
       }),
     ],
   },
+  */
 ];

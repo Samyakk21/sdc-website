@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 
 import { getCurrentSession } from "@/lib/auth";
 import {
-  opportunityCategories,
-  type OpportunityCategory,
+  departments,
+  type Department,
 } from "@/lib/opportunity-types";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
 
@@ -14,8 +14,8 @@ export type OpportunityFormState = {
   message: string;
 } | null;
 
-function isOpportunityCategory(value: string): value is OpportunityCategory {
-  return opportunityCategories.some((category) => category === value);
+function isDepartment(value: string): value is Department {
+  return departments.some((department) => department === value);
 }
 
 export async function createOpportunity(
@@ -33,10 +33,14 @@ export async function createOpportunity(
 
   const title = String(formData.get("title") ?? "").trim();
   const organization = String(formData.get("organization") ?? "").trim();
-  const category = String(formData.get("category") ?? "");
+  const departmentsRaw = formData.getAll("department");
+  const selectedDepartments = departmentsRaw
+    .map((value) => String(value).trim())
+    .filter(Boolean);
   const description = String(formData.get("description") ?? "").trim();
   const deadlineValue = String(formData.get("deadline") ?? "").trim();
   const applicationUrl = String(formData.get("application_url") ?? "").trim();
+  const tagsRaw = String(formData.get("tags") ?? "").trim();
   const parsedDeadline = deadlineValue
     ? new Date(`${deadlineValue}T00:00:00.000Z`)
     : null;
@@ -47,8 +51,13 @@ export async function createOpportunity(
   if (organization.length < 2 || organization.length > 120) {
     return { ok: false, message: "Organization must be between 2 and 120 characters." };
   }
-  if (!isOpportunityCategory(category)) {
-    return { ok: false, message: "Choose a valid opportunity category." };
+  if (selectedDepartments.length === 0) {
+    return { ok: false, message: "Select at least one department." };
+  }
+  for (const department of selectedDepartments) {
+    if (!isDepartment(department)) {
+      return { ok: false, message: "Choose valid departments." };
+    }
   }
   if (description.length < 20 || description.length > 2000) {
     return { ok: false, message: "Description must be between 20 and 2,000 characters." };
@@ -72,15 +81,31 @@ export async function createOpportunity(
     return { ok: false, message: "Application links must use http:// or https://." };
   }
 
+  // Tags: comma-separated, trimmed, deduplicated, max 5 tags, each max 30 chars.
+  const tags = tagsRaw
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  const uniqueTags = Array.from(new Set(tags));
+  if (uniqueTags.length > 5) {
+    return { ok: false, message: "Add at most 5 tags." };
+  }
+  for (const tag of uniqueTags) {
+    if (tag.length > 30) {
+      return { ok: false, message: "Each tag must be 30 characters or fewer." };
+    }
+  }
+
   const supabase = await createClient();
   const { error } = await supabase.from("opportunities").insert({
     title,
     organization,
-    category,
+    department: selectedDepartments,
     description,
     deadline: deadlineValue || null,
     application_url: applicationUrlValue.toString(),
     submitted_by: session.profile.id,
+    tags: uniqueTags,
   });
 
   if (error) {

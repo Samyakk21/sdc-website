@@ -8,7 +8,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { OpportunityCard } from "@/components/opportunities/opportunity-card";
 import { OpportunityForm } from "@/components/opportunities/opportunity-form";
 import {
-  opportunityCategories,
+  departments,
+  type Department,
   type Opportunity,
 } from "@/lib/opportunity-types";
 import type { OpportunityBoardStatus } from "@/lib/opportunities-repo";
@@ -25,21 +26,45 @@ export function OpportunityBoard({
   status: OpportunityBoardStatus;
 }) {
   const isAvailable = status === "ready";
-  const [category, setCategory] = useState("All");
+  const [selectedDepartments, setSelectedDepartments] = useState<Set<string>>(
+    new Set(),
+  );
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("popular");
   const [showForm, setShowForm] = useState(false);
+
+  // All unique tags across opportunities, for the tag filter chips.
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    opportunities.forEach((o) => (o.tags ?? []).forEach((tag) => set.add(tag)));
+    return Array.from(set).sort();
+  }, [opportunities]);
 
   const visibleOpportunities = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
     return opportunities
       .filter((opportunity) => {
-        const matchesCategory = category === "All" || opportunity.category === category;
+        // Department filter: match any selected department (multi-select).
+        const deptMatch =
+          selectedDepartments.size === 0 ||
+          opportunity.department.some((d) => selectedDepartments.has(d));
+        // Tag filter: match any selected tag (multi-select).
+        const tagMatch =
+          selectedTags.size === 0 ||
+          (opportunity.tags ?? []).some((tag) => selectedTags.has(tag));
         const matchesQuery =
           normalizedQuery.length === 0 ||
-          [opportunity.title, opportunity.organization, opportunity.description, opportunity.category]
-            .some((value) => value.toLowerCase().includes(normalizedQuery));
-        return matchesCategory && matchesQuery;
+          [
+            opportunity.title,
+            opportunity.organization,
+            opportunity.description,
+            opportunity.department,
+            ...(opportunity.tags ?? []),
+          ]
+            .map((value) => String(value).toLowerCase())
+            .some((value) => value.includes(normalizedQuery));
+        return deptMatch && tagMatch && matchesQuery;
       })
       .sort((a, b) => {
         if (sort === "popular") {
@@ -52,7 +77,23 @@ export function OpportunityBoard({
         }
         return b.created_at.localeCompare(a.created_at);
       });
-  }, [opportunities, category, query, sort]);
+  }, [opportunities, selectedDepartments, selectedTags, query, sort]);
+
+  function toggleDepartment(department: string) {
+    const next = new Set(selectedDepartments);
+    if (next.has(department)) next.delete(department);
+    else next.add(department);
+    setSelectedDepartments(next);
+  }
+
+  function toggleTag(tag: string) {
+    const next = new Set(selectedTags);
+    if (next.has(tag)) next.delete(tag);
+    else next.add(tag);
+    setSelectedTags(next);
+  }
+
+  const activeFilterCount = selectedDepartments.size + selectedTags.size;
 
   return (
     <>
@@ -99,22 +140,26 @@ export function OpportunityBoard({
 
       <div className="mt-10 flex flex-col gap-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by category">
-            {["All", ...opportunityCategories].map((item) => (
-              <button
-                key={item}
-                type="button"
-                onClick={() => setCategory(item)}
-                aria-pressed={category === item}
-                className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
-                  category === item
-                    ? "bg-brand-600 text-white"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                {item}
-              </button>
-            ))}
+          {/* Department multi-select */}
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by department">
+            {departments.map((department) => {
+              const active = selectedDepartments.has(department);
+              return (
+                <button
+                  key={department}
+                  type="button"
+                  onClick={() => toggleDepartment(department)}
+                  aria-pressed={active}
+                  className={`rounded-full px-3.5 py-2 text-sm font-medium transition-colors ${
+                    active
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  {department}
+                </button>
+              );
+            })}
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
@@ -152,13 +197,51 @@ export function OpportunityBoard({
           </div>
         </div>
 
+        {/* Tag multi-select chips (shown only when there are tags)} */}
+        {allTags.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by tag">
+            <span className="text-xs font-medium text-slate-500">Tags:</span>
+            {allTags.map((tag) => {
+              const active = selectedTags.has(tag);
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => toggleTag(tag)}
+                  aria-pressed={active}
+                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    active
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-100 text-slate-600 hover:bg-slate-200"
+                  }`}
+                >
+                  {tag}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {isAvailable ? (
           visibleOpportunities.length > 0 ? (
             <>
-              <p className="text-sm text-slate-500" aria-live="polite">
-                Showing {visibleOpportunities.length}{" "}
-                {visibleOpportunities.length === 1 ? "opportunity" : "opportunities"}
-              </p>
+              {activeFilterCount > 0 ? (
+                <p className="text-sm text-brand-600 font-medium" aria-live="polite">
+                  Showing {visibleOpportunities.length}{" "}
+                  {visibleOpportunities.length === 1 ? "opportunity" : "opportunities"}
+                  {selectedDepartments.size > 0 &&
+                    ` (department${
+                      selectedDepartments.size > 1 ? "s" : ""
+                    }: ${Array.from(selectedDepartments).join(", ")})`}
+                  {selectedTags.size > 0 &&
+                    ` (tag${selectedTags.size > 1 ? "s" : ""}: ${Array.from(selectedTags).join(", ")})`}
+                </p>
+              ) : (
+                <p className="text-sm text-slate-500" aria-live="polite">
+                  Showing {visibleOpportunities.length}{" "}
+                  {visibleOpportunities.length === 1 ? "opportunity" : "opportunities"}
+                </p>
+              )}
               <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {visibleOpportunities.map((opportunity) => (
                   <li key={opportunity.id} className="flex min-w-0">
@@ -169,8 +252,8 @@ export function OpportunityBoard({
             </>
           ) : opportunities.length > 0 ? (
             <EmptyState
-              title="No opportunities match your search"
-              description="Try another keyword or category to find what you're looking for."
+              title="No opportunities match your filters"
+              description="Try adjusting the department or tag filters, or use a different keyword."
             />
           ) : (
             <EmptyState

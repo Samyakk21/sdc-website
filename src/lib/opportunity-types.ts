@@ -1,21 +1,22 @@
-export const opportunityCategories = [
-  "Research",
-  "Internship",
-  "Hackathon",
-  "Job",
-  "Campus project",
-  "Fellowship",
-  "Competition",
-  "Other",
+export const departments = [
+  "EECS",
+  "DSE",
+  "Biology",
+  "Chemistry",
+  "Maths",
+  "Physics",
+  "EES",
+  "Economics",
+  "Chemical Engg",
 ] as const;
 
-export type OpportunityCategory = (typeof opportunityCategories)[number];
+export type Department = (typeof departments)[number];
 
 export type Opportunity = {
   id: string;
   title: string;
   organization: string;
-  category: OpportunityCategory;
+  department: Department[];
   description: string;
   deadline: string | null;
   application_url: string;
@@ -23,4 +24,5 @@ export type Opportunity = {
   upvote_count: number;
   created_at: string;
   has_upvoted: boolean;
+  tags: string[];
 };

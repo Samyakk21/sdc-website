@@ -1,19 +1,46 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { CheckCircle2, X } from "lucide-react";
 
 import {
   createOpportunity,
   type OpportunityFormState,
 } from "@/lib/opportunities/actions";
-import { opportunityCategories } from "@/lib/opportunity-types";
+import { departments, type Department } from "@/lib/opportunity-types";
 
 export function OpportunityForm({ onClose }: { onClose: () => void }) {
   const [state, formAction, pending] = useActionState<OpportunityFormState, FormData>(
     createOpportunity,
     null,
   );
+
+  const [selectedDepartments, setSelectedDepartments] = useState<Set<Department>>(
+    new Set(),
+  );
+  const [tagInput, setTagInput] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+
+  function toggleDepartment(department: Department) {
+    const next = new Set(selectedDepartments);
+    if (next.has(department)) next.delete(department);
+    else next.add(department);
+    setSelectedDepartments(next);
+  }
+
+  function addTag() {
+    const trimmed = tagInput.trim();
+    if (!trimmed) return;
+    if (trimmed.length > 30) return;
+    if (tags.length >= 5) return;
+    if (tags.includes(trimmed)) return;
+    setTags([...tags, trimmed]);
+    setTagInput("");
+  }
+
+  function removeTag(tag: string) {
+    setTags(tags.filter((t) => t !== tag));
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/55 p-0 backdrop-blur-sm sm:items-center sm:p-6">
@@ -44,6 +71,16 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
             <X className="h-5 w-5" aria-hidden />
           </button>
         </div>
+
+        {/* Hidden inputs so selected departments are submitted with the form. */}
+        {Array.from(selectedDepartments).map((department) => (
+          <input
+            key={department}
+            type="hidden"
+            name="department"
+            value={department}
+          />
+        ))}
 
         {state?.ok ? (
           <div className="mt-8 rounded-xl border border-green-200 bg-green-50 p-6 text-center">
@@ -85,22 +122,36 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
               </label>
             </div>
 
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="space-y-3">
               <label className="block text-sm font-medium text-slate-700">
-                Category
-                <select
-                  name="category"
-                  required
-                  defaultValue="Research"
-                  className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500"
-                >
-                  {opportunityCategories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
+                Department <span className="font-normal text-slate-400">· select all that apply</span>
               </label>
+              <div className="flex flex-wrap gap-2" role="group" aria-label="Departments">
+                {departments.map((department) => {
+                  const active = selectedDepartments.has(department);
+                  return (
+                    <button
+                      key={department}
+                      type="button"
+                      onClick={() => toggleDepartment(department)}
+                      aria-pressed={active}
+                      className={`rounded-full border px-3.5 py-2 text-sm font-medium transition-colors ${
+                        active
+                          ? "border-brand-600 bg-brand-50 text-brand-700"
+                          : "border-slate-300 text-slate-700 hover:border-brand-500 hover:bg-brand-50"
+                      }`}
+                    >
+                      {department}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-slate-500">
+                Selected: {selectedDepartments.size} of {departments.length}
+              </p>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
               <label className="block text-sm font-medium text-slate-700">
                 Application deadline <span className="font-normal text-slate-400">· optional</span>
                 <input
@@ -109,10 +160,51 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
                   className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 focus:border-brand-500"
                 />
               </label>
+              <label className="block text-sm font-medium text-slate-700">
+                Tags
+                <input
+                  name="tags"
+                  type="text"
+                  value={tagInput}
+                  onChange={(event) => setTagInput(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === ",") {
+                      event.preventDefault();
+                      addTag();
+                    }
+                  }}
+                  placeholder="e.g. research, paid, summer"
+                  className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500"
+                />
+              </label>
             </div>
 
-            <label className="block text-sm font-medium text-slate-700">
-              What should applicants know?
+            {tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs font-medium text-slate-500">Selected tags:</span>
+                {tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700"
+                  >
+                    {tag}
+                    <button
+                      type="button"
+                      onClick={() => removeTag(tag)}
+                      aria-label={`Remove tag ${tag}`}
+                      className="rounded-full p-0.5 text-brand-600 hover:bg-brand-100"
+                    >
+                      <X className="h-3 w-3" aria-hidden />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <label className="block text-sm font-medium text-slate-700">
+                What should applicants know?
+              </label>
               <textarea
                 name="description"
                 required
@@ -122,7 +214,7 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
                 placeholder="Share the role, who can apply, and any details that will help students decide."
                 className="mt-1.5 w-full resize-y rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-brand-500"
               />
-            </label>
+            </div>
 
             <label className="block text-sm font-medium text-slate-700">
               Application link

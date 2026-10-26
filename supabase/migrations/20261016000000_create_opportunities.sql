@@ -7,21 +7,20 @@ create table public.opportunities (
   id             uuid primary key default gen_random_uuid(),
   title          text not null check (char_length(btrim(title)) between 5 and 160),
   organization   text not null check (char_length(btrim(organization)) between 2 and 120),
-  category       text not null check (category in (
-                   'Research', 'Internship', 'Hackathon', 'Job',
-                   'Campus project', 'Fellowship', 'Competition', 'Other'
-                 )),
+  department     text[] not null default '{}',
   description    text not null check (char_length(btrim(description)) between 20 and 2000),
   deadline       date,
   application_url text not null check (application_url ~ '^https?://'),
   submitted_by   uuid not null references public.users (id) on delete cascade,
   upvote_count   integer not null default 0 check (upvote_count >= 0),
+  tags           text[] not null default '{}',
   created_at     timestamptz not null default now()
 );
 
 create index opportunities_created_at_idx on public.opportunities (created_at desc);
 create index opportunities_upvote_count_idx on public.opportunities (upvote_count desc);
-create index opportunities_category_idx on public.opportunities (category);
+create index opportunities_department_idx on public.opportunities using gin (department);
+create index opportunities_tags_idx on public.opportunities using gin (tags);
 
 alter table public.opportunities enable row level security;
 

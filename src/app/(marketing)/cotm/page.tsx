@@ -12,7 +12,7 @@ import { getEventsByTrack } from "@/lib/content/events";
 export const metadata: Metadata = {
   title: "Career of the Month",
   description:
-    "Career of the Month is taking a break this semester and returns in January 2027. The first topic, Bioinformatics, is to be confirmed.",
+    "Career of the Month is starting in January 2027. The first topic, Bioinformatics, is to be confirmed.",
 };
 
 const steps = [
