@@ -7,6 +7,17 @@ export type { Opportunity } from "@/lib/opportunity-types";
 
 export type OpportunityBoardStatus = "ready" | "database-unconfigured" | "migration-required";
 
+// PostgREST/Postgres errors that mean the opportunities schema is missing or
+// still on an older version:
+//   PGRST205 - table not found in the schema cache
+//   42P01    - undefined_table
+//   42703    - undefined_column (e.g. department/tags not added yet)
+const missingSchemaErrorCodes = new Set(["PGRST205", "42P01", "42703"]);
+
+function isMissingSchemaError(code: string | undefined): boolean {
+  return code ? missingSchemaErrorCodes.has(code) : false;
+}
+
 export async function listOpportunities(
   userId?: string,
 ): Promise<{ opportunities: Opportunity[]; status: OpportunityBoardStatus }> {
@@ -23,7 +34,7 @@ export async function listOpportunities(
     .order("created_at", { ascending: false });
 
   if (opportunitiesResult.error) {
-    if (opportunitiesResult.error.code === "PGRST205") {
+    if (isMissingSchemaError(opportunitiesResult.error.code)) {
       console.error("The opportunities migration has not been applied:", opportunitiesResult.error);
       return { opportunities: [], status: "migration-required" };
     }
@@ -38,7 +49,7 @@ export async function listOpportunities(
       .eq("user_id", userId);
 
     if (votesResult.error) {
-      if (votesResult.error.code === "PGRST205") {
+      if (isMissingSchemaError(votesResult.error.code)) {
         console.error("The opportunity votes migration has not been applied:", votesResult.error);
         return { opportunities: [], status: "migration-required" };
       }
