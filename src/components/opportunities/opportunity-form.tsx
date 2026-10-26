@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { CheckCircle2, X } from "lucide-react";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { CheckCircle2, ChevronDown, X } from "lucide-react";
 
 import {
   createOpportunity,
@@ -20,6 +20,33 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
   );
   const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [departmentMenuOpen, setDepartmentMenuOpen] = useState(false);
+  const departmentMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close the department dropdown when clicking outside or pressing Escape.
+  useEffect(() => {
+    if (!departmentMenuOpen) return;
+
+    function handlePointerDown(event: MouseEvent) {
+      if (
+        departmentMenuRef.current &&
+        !departmentMenuRef.current.contains(event.target as Node)
+      ) {
+        setDepartmentMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setDepartmentMenuOpen(false);
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [departmentMenuOpen]);
 
   function toggleDepartment(department: Department) {
     const next = new Set(selectedDepartments);
@@ -72,16 +99,6 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {/* Hidden inputs so selected departments are submitted with the form. */}
-        {Array.from(selectedDepartments).map((department) => (
-          <input
-            key={department}
-            type="hidden"
-            name="department"
-            value={department}
-          />
-        ))}
-
         {state?.ok ? (
           <div className="mt-8 rounded-xl border border-green-200 bg-green-50 p-6 text-center">
             <CheckCircle2 className="mx-auto h-10 w-10 text-green-700" aria-hidden />
@@ -97,6 +114,16 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
           </div>
         ) : (
           <form action={formAction} className="mt-7 space-y-5">
+            {/* Hidden inputs so every selected department is submitted. */}
+            {Array.from(selectedDepartments).map((department) => (
+              <input
+                key={department}
+                type="hidden"
+                name="department"
+                value={department}
+              />
+            ))}
+
             <div className="grid gap-5 sm:grid-cols-2">
               <label className="block text-sm font-medium text-slate-700">
                 Opportunity title
@@ -122,33 +149,92 @@ export function OpportunityForm({ onClose }: { onClose: () => void }) {
               </label>
             </div>
 
-            <div className="space-y-3">
-              <label className="block text-sm font-medium text-slate-700">
-                Department <span className="font-normal text-slate-400">· select all that apply</span>
+            <div className="space-y-2">
+              <label
+                htmlFor="department-select"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Department{" "}
+                <span className="font-normal text-slate-400">· select all that apply</span>
               </label>
-              <div className="flex flex-wrap gap-2" role="group" aria-label="Departments">
-                {departments.map((department) => {
-                  const active = selectedDepartments.has(department);
-                  return (
-                    <button
+              <div className="relative" ref={departmentMenuRef}>
+                <button
+                  id="department-select"
+                  type="button"
+                  onClick={() => setDepartmentMenuOpen((open) => !open)}
+                  aria-haspopup="listbox"
+                  aria-expanded={departmentMenuOpen}
+                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-left text-sm transition-colors hover:border-brand-500 focus:border-brand-500"
+                >
+                  <span
+                    className={
+                      selectedDepartments.size > 0
+                        ? "text-slate-900"
+                        : "text-slate-400"
+                    }
+                  >
+                    {selectedDepartments.size === 0
+                      ? "Select departments"
+                      : `${selectedDepartments.size} department${
+                          selectedDepartments.size === 1 ? "" : "s"
+                        } selected`}
+                  </span>
+                  <ChevronDown
+                    className={`h-4 w-4 shrink-0 text-slate-500 transition-transform ${
+                      departmentMenuOpen ? "rotate-180" : ""
+                    }`}
+                    aria-hidden
+                  />
+                </button>
+
+                {departmentMenuOpen ? (
+                  <div
+                    role="listbox"
+                    aria-multiselectable="true"
+                    aria-label="Departments"
+                    className="absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white p-1 shadow-lg"
+                  >
+                    {departments.map((department) => {
+                      const active = selectedDepartments.has(department);
+                      return (
+                        <label
+                          key={department}
+                          className="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={active}
+                            onChange={() => toggleDepartment(department)}
+                            className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                          />
+                          {department}
+                        </label>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              {selectedDepartments.size > 0 ? (
+                <div className="flex flex-wrap gap-2 pt-1">
+                  {Array.from(selectedDepartments).map((department) => (
+                    <span
                       key={department}
-                      type="button"
-                      onClick={() => toggleDepartment(department)}
-                      aria-pressed={active}
-                      className={`rounded-full border px-3.5 py-2 text-sm font-medium transition-colors ${
-                        active
-                          ? "border-brand-600 bg-brand-50 text-brand-700"
-                          : "border-slate-300 text-slate-700 hover:border-brand-500 hover:bg-brand-50"
-                      }`}
+                      className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700"
                     >
                       {department}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="text-xs text-slate-500">
-                Selected: {selectedDepartments.size} of {departments.length}
-              </p>
+                      <button
+                        type="button"
+                        onClick={() => toggleDepartment(department)}
+                        aria-label={`Remove ${department}`}
+                        className="rounded-full p-0.5 text-brand-600 hover:bg-brand-100"
+                      >
+                        <X className="h-3 w-3" aria-hidden />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              ) : null}
             </div>
 
             <div className="grid gap-5 sm:grid-cols-2">
