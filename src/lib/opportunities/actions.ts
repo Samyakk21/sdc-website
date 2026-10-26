@@ -10,6 +10,7 @@ import {
   type OpportunityTag,
 } from "@/lib/opportunity-types";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
+import { missingOptionalColumn } from "@/lib/opportunities-repo";
 
 export type OpportunityFormState = {
   ok: boolean;
@@ -46,6 +47,7 @@ export async function createOpportunity(
   const description = String(formData.get("description") ?? "").trim();
   const deadlineValue = String(formData.get("deadline") ?? "").trim();
   const applicationUrl = String(formData.get("application_url") ?? "").trim();
+  const anonymous = formData.get("is_anonymous") === "on";
   const tagsRaw = String(formData.get("tags") ?? "").trim();
   const parsedDeadline = deadlineValue
     ? new Date(`${deadlineValue}T00:00:00.000Z`)
@@ -113,7 +115,7 @@ export async function createOpportunity(
     ""
   ).slice(0, 60);
 
-  const basePayload = {
+  const payload: Record<string, unknown> = {
     title,
     organization,
     department: selectedDepartments,
@@ -122,26 +124,32 @@ export async function createOpportunity(
     application_url: applicationUrlValue.toString(),
     submitted_by: session.profile.id,
     tags: uniqueTags,
+    // Names are recorded even for anonymous posts: `submitted_by` plus the
+    // contributor snapshot power per-user stats, while `is_anonymous` only
+    // decides whether the board shows the name.
+    contributor_name: contributorName || null,
+    is_anonymous: anonymous,
   };
 
-  let { error } = await supabase
-    .from("opportunities")
-    .insert({ ...basePayload, contributor_name: contributorName || null });
-
-  // The contributor column ships in its own migration; if it isn't applied yet
+  // Optional columns ship in their own migration; if one isn't applied yet
   // still accept the post rather than failing the whole form.
-  if (
-    error?.code === "42703" &&
-    /contributor_name/.test(error.message ?? "")
-  ) {
+  let insertError: { code?: string; message?: string } | null = null;
+  for (let attempt = 0; attempt <= 2; attempt += 1) {
+    const { error } = await supabase.from("opportunities").insert(payload);
+    insertError = error;
+    if (!error) break;
+
+    const missing = missingOptionalColumn(error);
+    if (!missing || !(missing in payload)) break;
+
     console.warn(
-      "opportunities.contributor_name is missing; saving without it. Apply supabase/migrations/20261026000100_opportunity_contributor.sql.",
+      `opportunities.${missing} is missing; saving without it. Run supabase/migrations/20261027000000_opportunity_anonymous.sql.`,
     );
-    ({ error } = await supabase.from("opportunities").insert(basePayload));
+    delete payload[missing];
   }
 
-  if (error) {
-    console.error("Could not create opportunity:", error);
+  if (insertError) {
+    console.error("Could not create opportunity:", insertError);
     return { ok: false, message: "Couldn't share this opportunity. Please try again." };
   }
 

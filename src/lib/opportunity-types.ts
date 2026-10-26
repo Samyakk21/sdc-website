@@ -38,6 +38,7 @@ export type Opportunity = {
   application_url: string;
   submitted_by: string;
   contributor_name: string | null;
+  is_anonymous: boolean;
   upvote_count: number;
   created_at: string;
   has_upvoted: boolean;

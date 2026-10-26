@@ -13,6 +13,7 @@ create table public.opportunities (
   application_url text not null check (application_url ~ '^https?://'),
   submitted_by   uuid not null references public.users (id) on delete cascade,
   contributor_name text check (contributor_name is null or char_length(btrim(contributor_name)) between 1 and 60),
+  is_anonymous   boolean not null default false,
   upvote_count   integer not null default 0 check (upvote_count >= 0),
   tags           text[] not null default '{}',
   created_at     timestamptz not null default now()

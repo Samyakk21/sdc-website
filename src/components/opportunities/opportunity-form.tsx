@@ -196,6 +196,21 @@ export function OpportunityForm({
               )}
             </p>
 
+            <label className="flex items-start gap-3 rounded-lg border border-slate-200 px-3 py-2.5 text-sm text-slate-700">
+              <input
+                type="checkbox"
+                name="is_anonymous"
+                className="mt-0.5 h-4 w-4 rounded border-slate-300 accent-brand-600"
+              />
+              <span>
+                <span className="font-medium">Post anonymously</span>
+                <span className="mt-0.5 block text-xs font-normal leading-relaxed text-slate-500">
+                  Your name stays off the board, but the post is still linked to
+                  your account for upvote stats.
+                </span>
+              </span>
+            </label>
+
             <div className="space-y-2">
               <label
                 htmlFor="department-select"

@@ -81,7 +81,12 @@ export function OpportunityCard({
         {opportunity.description}
       </p>
 
-      {opportunity.contributor_name ? (
+      {opportunity.is_anonymous ? (
+        <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
+          <UserRound className="h-3.5 w-3.5" aria-hidden />
+          Shared anonymously
+        </p>
+      ) : opportunity.contributor_name ? (
         <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
           <UserRound className="h-3.5 w-3.5" aria-hidden />
           Contributed by {opportunity.contributor_name}

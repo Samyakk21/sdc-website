@@ -18,18 +18,33 @@ function isMissingSchemaError(code: string | undefined): boolean {
   return code ? missingSchemaErrorCodes.has(code) : false;
 }
 
-const opportunityColumns =
-  "id, title, organization, department, description, deadline, application_url, submitted_by, upvote_count, created_at, tags";
-
-const opportunityColumnsWithContributor = `${opportunityColumns}, contributor_name`;
+const requiredOpportunityColumns = [
+  "id",
+  "title",
+  "organization",
+  "department",
+  "description",
+  "deadline",
+  "application_url",
+  "submitted_by",
+  "upvote_count",
+  "created_at",
+  "tags",
+];
 
 /**
- * Column added by 20261026000100_opportunity_contributor.sql. When it is
- * missing we keep the board usable (contributor names just stay blank)
- * instead of blanking the whole page behind a setup notice.
+ * Columns that ship in their own migrations. When one is missing we keep the
+ * board usable (names hidden, anonymity ignored) instead of blanking the whole
+ * page behind a setup notice.
  */
-function isMissingContributorColumn(error: { code?: string; message?: string } | null) {
-  return error?.code === "42703" && /contributor_name/.test(error.message ?? "");
+const optionalOpportunityColumns = ["contributor_name", "is_anonymous"] as const;
+
+export function missingOptionalColumn(
+  error: { code?: string; message?: string } | null,
+): string | null {
+  if (error?.code !== "42703") return null;
+  const message = error.message ?? "";
+  return optionalOpportunityColumns.find((column) => message.includes(column)) ?? null;
 }
 
 export async function listOpportunities(
@@ -40,18 +55,23 @@ export async function listOpportunities(
   }
 
   const supabase = await createClient();
-  const fetchRows = (columns: string) =>
-    supabase.from("opportunities").select(columns).order("created_at", { ascending: false });
+  const fetchRows = (optional: readonly string[]) =>
+    supabase
+      .from("opportunities")
+      .select([...requiredOpportunityColumns, ...optional].join(", "))
+      .order("created_at", { ascending: false });
 
-  let opportunitiesResult = await fetchRows(opportunityColumnsWithContributor);
-  let hasContributorColumn = true;
+  const optional: string[] = [...optionalOpportunityColumns];
+  let opportunitiesResult = await fetchRows(optional);
 
-  if (isMissingContributorColumn(opportunitiesResult.error)) {
-    hasContributorColumn = false;
+  while (opportunitiesResult.error) {
+    const missing = missingOptionalColumn(opportunitiesResult.error);
+    if (!missing) break;
     console.warn(
-      "opportunities.contributor_name is missing; apply supabase/migrations/20261026000100_opportunity_contributor.sql to show contributor names.",
+      `opportunities.${missing} is missing; run supabase/migrations/20261027000000_opportunity_anonymous.sql to enable it.`,
     );
-    opportunitiesResult = await fetchRows(opportunityColumns);
+    optional.splice(optional.indexOf(missing), 1);
+    opportunitiesResult = await fetchRows(optional);
   }
 
   if (opportunitiesResult.error) {
@@ -83,7 +103,12 @@ export async function listOpportunities(
     opportunities: ((opportunitiesResult.data ?? []) as unknown as OpportunityRow[]).map((opportunity) => ({
       ...opportunity,
       department: Array.isArray(opportunity.department) ? opportunity.department : [],
-      contributor_name: hasContributorColumn ? opportunity.contributor_name ?? null : null,
+      contributor_name: optional.includes("contributor_name")
+        ? opportunity.contributor_name ?? null
+        : null,
+      is_anonymous: optional.includes("is_anonymous")
+        ? Boolean(opportunity.is_anonymous)
+        : false,
       tags: Array.isArray(opportunity.tags) ? opportunity.tags : [],
       has_upvoted: votedIds.has(opportunity.id),
     })),
