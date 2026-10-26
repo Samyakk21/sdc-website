@@ -57,7 +57,7 @@ export const teamGroups: TeamGroup[] = [
       }),
       t("Angel ", "Information and PR", "/images/team/angel.jpg", {
         quote: "I like cells and stars.",
-        linkedin: "https://www.linkedin.com/in/karthikmattupalli/",
+        linkedin: "https://www.linkedin.com/in/angel-yadav/",
         email: "mattupalli24@iiserb.ac.in",
       }),
       t("AARUSHI BHATTACHARYA", "YLAC", "/images/team/aarushi2.jpeg", {
@@ -67,7 +67,7 @@ export const teamGroups: TeamGroup[] = [
       }),
       t("DISHANK K", "E-CELL", "/images/team/dishank.jpeg", {
         quote: "Slightly unhinged, mostly intentional",
-        linkedin: "https://www.linkedin.com/in/karthikmattupalli/",
+        linkedin: "https://www.linkedin.com/in/dishank-k-6137b132a/",
         email: "dishank24@iiserb.ac.in",
       }),
     ],
