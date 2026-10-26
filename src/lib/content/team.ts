@@ -21,13 +21,13 @@ export const teamGroups: TeamGroup[] = [
     title: "Student Advisor",
     members: [
       t("Sidharth Raman", "Student Advisor", "/images/team/sidharth.png", {
-        quote: "I overthink everything - mostly on purpose",
+        quote: "",
         linkedin: "https://www.linkedin.com/in/sid-raman/",
         email: "manas22@iiserb.ac.in",
       }),
-      t("Dhani", "Student Advisor", "/images/team/manas.jpg", {
-        quote: "I overthink everything - mostly on purpose",
-        linkedin: "https://www.linkedin.com/in/manas-nandan/",
+      t("Dhani", "Student Advisor", "/images/team/", {
+        quote: "",
+        linkedin: "",
         email: "manas22@iiserb.ac.in",
       }),
     ],
@@ -51,7 +51,7 @@ export const teamGroups: TeamGroup[] = [
         email: "samyak25@iiserb.ac.in",
       }),
       t("Ishika Ashish", "Design", "/images/team/ishika2.jpg", {
-        quote: "Supporting Operations, Coordination, and Smooth Execution of Initiatives.",
+        quote: "Never witnessed Diminishing Marginal Utility with Canva ;).",
         linkedin: "https://www.linkedin.com/in/ishika-ashish-a01389373/",
         email: "mattupalli24@iiserb.ac.in",
       }),
