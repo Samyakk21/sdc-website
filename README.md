@@ -65,18 +65,29 @@ simply report no session, and the auth flows activate once credentials are set.
 ## Supabase setup
 
 1. Create a Supabase project and add Google as an OAuth provider
-   (Authentication → Providers). Authorized redirect URIs must include:
-   - `http://localhost:3000/auth/callback` (local dev)
-   - `https://<your-domain>/auth/callback` (production)
-2. Apply the schema migration. With the Supabase CLI:
+   (Authentication → Providers). In Google Cloud Console the authorized
+   redirect URI is Supabase's callback, not the app's:
+   `https://<project-ref>.supabase.co/auth/v1/callback`.
+2. In Supabase → Authentication → URL Configuration:
+   - **Site URL:** `https://sdc-iiserb.vercel.app`
+   - **Redirect URLs:** `https://sdc-iiserb.vercel.app/**` and
+     `http://localhost:3000/**`
+
+   The app sends an explicit `redirect_to`, but Supabase falls back to the Site
+   URL when it is not allow-listed. Never point either setting at a Vercel
+   alias (`sdc-website-*.vercel.app`): those hosts are behind Deployment
+   Protection and use separate cookies, so sign-in appears to fail. The proxy
+   also redirects the project's aliases to the canonical `NEXT_PUBLIC_SITE_URL`
+   host to keep OAuth callbacks on one domain.
+3. Apply the schema migration. With the Supabase CLI:
    ```bash
    supabase link --project-ref <ref>
    supabase db push
    ```
    or paste `supabase/migrations/*.sql` into the Supabase SQL editor.
-3. Seed admin accounts by inserting approved IISERB email addresses into
+4. Seed admin accounts by inserting approved IISERB email addresses into
    `admin_emails` (see the seed migration / SQL editor).
-4. Restart `npm run dev`.
+5. Restart `npm run dev`.
 
 ### Sign-in policy
 
