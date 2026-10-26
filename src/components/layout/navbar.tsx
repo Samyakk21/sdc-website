@@ -32,13 +32,13 @@ export function Navbar({ session }: { session: NavbarSession }) {
   );
 
   const navLinks = [
-    { href: "/about", label: "About" },
     { href: "/team", label: "Team" },
     { href: "/initiatives", label: "Initiatives" },
     { href: "/events", label: "Events" },
     { href: "/opportunities", label: "Opportunities" },
     { href: "/cotm", label: "Career of the Month" },
     { href: "/resources", label: "Resources" },
+    { href: "/about", label: "About" },
     ...(isAdmin ? [{ href: "/admin", label: "Admin" }] : []),
   ];
 
@@ -50,14 +50,14 @@ export function Navbar({ session }: { session: NavbarSession }) {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
       <nav
-        className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:justify-items-center lg:px-8"
+        className="mx-auto flex h-16 w-full max-w-[96rem] items-center justify-between gap-4 px-4 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:justify-items-center lg:px-8"
         aria-label="Main"
       >
         <div className="justify-self-start">
           <Brand />
         </div>
 
-        <ul className="hidden items-center gap-1 lg:flex">
+        <ul className="hidden items-center gap-0.5 lg:flex">
           {navLinks.map((link) => {
             const active = isActive(link.href);
             return (
@@ -65,7 +65,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
                 <Link
                   href={link.href}
                   aria-current={active ? "page" : undefined}
-                  className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+                  className={`rounded-md px-2.5 py-2 text-center text-sm font-medium leading-tight transition-colors ${
                     active ? "bg-brand-50 text-brand-700" : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
@@ -98,7 +98,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
                 >
                   {initials(session.full_name)}
                 </span>
-                <span className="max-w-[10rem] truncate text-sm font-medium text-slate-700">
+                <span className="max-w-[9rem] truncate text-sm font-medium text-slate-700">
                   {session.full_name ?? "Your account"}
                 </span>
               </Link>
@@ -135,7 +135,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
 
       {open ? (
         <div id="mobile-menu" className="border-t border-slate-200 bg-white lg:hidden">
-          <ul className="mx-auto flex w-full max-w-7xl flex-col gap-1 px-4 py-4">
+          <ul className="mx-auto flex w-full max-w-[96rem] flex-col gap-1 px-4 py-4">
             {navLinks.map((link) => {
               const active = isActive(link.href);
               return (

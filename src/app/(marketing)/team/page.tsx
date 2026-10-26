@@ -15,9 +15,9 @@ export default function TeamPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Team · Tenure 2025–26"
-        title="Meet the SDC Team (2025–26)"
-        description="The faculty and students who run the Student Development Council at IISER Bhopal for the 2025–26 tenure — advisors, office bearers, the core committee, and our trainees."
+        eyebrow="Team · Tenure 2026–27"
+        title="Meet the SDC Team (2026–27)"
+        description="The faculty and students who run the Student Development Council at IISER Bhopal for the 2026–27 tenure — advisors, office bearers, the core committee, and our trainees."
       />
       <Container className="space-y-20 py-16 sm:py-20">
         {teamGroups.map((group) => (

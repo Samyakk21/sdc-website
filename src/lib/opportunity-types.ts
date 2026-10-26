@@ -12,6 +12,22 @@ export const departments = [
 
 export type Department = (typeof departments)[number];
 
+// Curated tags (the PR-1 board categories, plus Industry/Academia).
+export const opportunityTags = [
+  "Research",
+  "Internship",
+  "Hackathon",
+  "Industry",
+  "Academia",
+  "Job",
+  "Campus project",
+  "Fellowship",
+  "Competition",
+  "Other",
+] as const;
+
+export type OpportunityTag = (typeof opportunityTags)[number];
+
 export type Opportunity = {
   id: string;
   title: string;
@@ -21,6 +37,7 @@ export type Opportunity = {
   deadline: string | null;
   application_url: string;
   submitted_by: string;
+  contributor_name: string | null;
   upvote_count: number;
   created_at: string;
   has_upvoted: boolean;

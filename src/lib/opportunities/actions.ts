@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { getCurrentSession } from "@/lib/auth";
 import {
   departments,
+  opportunityTags,
   type Department,
+  type OpportunityTag,
 } from "@/lib/opportunity-types";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
 
@@ -16,6 +18,10 @@ export type OpportunityFormState = {
 
 function isDepartment(value: string): value is Department {
   return departments.some((department) => department === value);
+}
+
+function isOpportunityTag(value: string): value is OpportunityTag {
+  return opportunityTags.some((tag) => tag === value);
 }
 
 export async function createOpportunity(
@@ -40,6 +46,7 @@ export async function createOpportunity(
   const description = String(formData.get("description") ?? "").trim();
   const deadlineValue = String(formData.get("deadline") ?? "").trim();
   const applicationUrl = String(formData.get("application_url") ?? "").trim();
+  const contributorName = String(formData.get("contributor_name") ?? "").trim();
   const tagsRaw = String(formData.get("tags") ?? "").trim();
   const parsedDeadline = deadlineValue
     ? new Date(`${deadlineValue}T00:00:00.000Z`)
@@ -62,6 +69,9 @@ export async function createOpportunity(
   if (description.length < 20 || description.length > 2000) {
     return { ok: false, message: "Description must be between 20 and 2,000 characters." };
   }
+  if (contributorName.length > 60) {
+    return { ok: false, message: "Contributor name must be 60 characters or fewer." };
+  }
   if (
     deadlineValue &&
     (!/^\d{4}-\d{2}-\d{2}$/.test(deadlineValue) ||
@@ -81,7 +91,7 @@ export async function createOpportunity(
     return { ok: false, message: "Application links must use http:// or https://." };
   }
 
-  // Tags: comma-separated, trimmed, deduplicated, max 5 tags, each max 30 chars.
+  // Tags: comma-separated and restricted to the curated board categories.
   const tags = tagsRaw
     .split(",")
     .map((tag) => tag.trim())
@@ -91,8 +101,8 @@ export async function createOpportunity(
     return { ok: false, message: "Add at most 5 tags." };
   }
   for (const tag of uniqueTags) {
-    if (tag.length > 30) {
-      return { ok: false, message: "Each tag must be 30 characters or fewer." };
+    if (!isOpportunityTag(tag)) {
+      return { ok: false, message: "Choose valid tags." };
     }
   }
 
@@ -105,6 +115,7 @@ export async function createOpportunity(
     deadline: deadlineValue || null,
     application_url: applicationUrlValue.toString(),
     submitted_by: session.profile.id,
+    contributor_name: contributorName || null,
     tags: uniqueTags,
   });
 

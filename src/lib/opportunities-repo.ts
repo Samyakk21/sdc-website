@@ -29,7 +29,7 @@ export async function listOpportunities(
   const opportunitiesResult = await supabase
     .from("opportunities")
     .select(
-      "id, title, organization, department, description, deadline, application_url, submitted_by, upvote_count, created_at, tags",
+      "id, title, organization, department, description, deadline, application_url, submitted_by, contributor_name, upvote_count, created_at, tags",
     )
     .order("created_at", { ascending: false });
 
@@ -62,6 +62,7 @@ export async function listOpportunities(
     opportunities: ((opportunitiesResult.data ?? []) as OpportunityRow[]).map((opportunity) => ({
       ...opportunity,
       department: Array.isArray(opportunity.department) ? opportunity.department : [],
+      contributor_name: opportunity.contributor_name ?? null,
       tags: Array.isArray(opportunity.tags) ? opportunity.tags : [],
       has_upvoted: votedIds.has(opportunity.id),
     })),

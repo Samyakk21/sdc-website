@@ -16,7 +16,7 @@ export default function InitiativesPage() {
       <PageHeader
         eyebrow="Initiatives"
         title="What we do"
-        description="Six core verticals working together to accelerate your growth and success — each built around a real need of the student community."
+        description="Our core verticals working together to accelerate your growth and success — each built around a real need of the student community."
       />
       <Container className="py-16 sm:py-20">
         <div className="space-y-12">

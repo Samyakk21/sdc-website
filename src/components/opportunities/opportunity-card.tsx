@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { ArrowUp, CalendarDays, ExternalLink } from "lucide-react";
+import { ArrowUp, CalendarDays, ExternalLink, UserRound } from "lucide-react";
 
 import { toggleOpportunityVote } from "@/lib/opportunities/actions";
 import type { Opportunity } from "@/lib/opportunity-types";
@@ -80,6 +80,13 @@ export function OpportunityCard({
       <p className="mt-3 line-clamp-4 whitespace-pre-line text-sm leading-relaxed text-slate-600">
         {opportunity.description}
       </p>
+
+      {opportunity.contributor_name ? (
+        <p className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-500">
+          <UserRound className="h-3.5 w-3.5" aria-hidden />
+          Contributed by {opportunity.contributor_name}
+        </p>
+      ) : null}
 
       <div className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-5 mt-6">
         <div>

@@ -7,15 +7,13 @@ import {
   createOpportunity,
   type OpportunityFormState,
 } from "@/lib/opportunities/actions";
-import { departments, type Department } from "@/lib/opportunity-types";
+import {
+  departments,
+  opportunityTags,
+  type Department,
+} from "@/lib/opportunity-types";
 
-export function OpportunityForm({
-  onClose,
-  availableTags = [],
-}: {
-  onClose: () => void;
-  availableTags?: string[];
-}) {
+export function OpportunityForm({ onClose }: { onClose: () => void }) {
   const [state, formAction, pending] = useActionState<OpportunityFormState, FormData>(
     createOpportunity,
     null,
@@ -24,7 +22,6 @@ export function OpportunityForm({
   const [selectedDepartments, setSelectedDepartments] = useState<Set<Department>>(
     new Set(),
   );
-  const [tagInput, setTagInput] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [departmentMenuOpen, setDepartmentMenuOpen] = useState(false);
   const departmentMenuRef = useRef<HTMLDivElement>(null);
@@ -85,16 +82,6 @@ export function OpportunityForm({
     setSelectedDepartments(next);
   }
 
-  function addTag() {
-    const trimmed = tagInput.trim();
-    if (!trimmed) return;
-    if (trimmed.length > 30) return;
-    if (tags.length >= 5) return;
-    if (tags.includes(trimmed)) return;
-    setTags([...tags, trimmed]);
-    setTagInput("");
-  }
-
   function removeTag(tag: string) {
     setTags(tags.filter((t) => t !== tag));
   }
@@ -104,12 +91,9 @@ export function OpportunityForm({
       setTags(tags.filter((t) => t !== tag));
       return;
     }
-    if (tags.length >= 5 || tag.length > 30) return;
+    if (tags.length >= 5) return;
     setTags([...tags, tag]);
   }
-
-  // Existing tags from the board plus anything already selected locally.
-  const tagOptions = Array.from(new Set([...availableTags, ...tags])).sort();
 
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/55 p-0 backdrop-blur-sm sm:items-center sm:p-6">
@@ -192,6 +176,21 @@ export function OpportunityForm({
                 />
               </label>
             </div>
+
+            <label className="block text-sm font-medium text-slate-700">
+              Show your name as contributor{" "}
+              <span className="font-normal text-slate-400">· optional</span>
+              <input
+                name="contributor_name"
+                type="text"
+                maxLength={60}
+                placeholder="e.g. Aditi Sharma or @aditi"
+                className="mt-1.5 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500"
+              />
+              <span className="mt-1 block text-xs font-normal text-slate-500">
+                Leave blank to share anonymously.
+              </span>
+            </label>
 
             <div className="space-y-2">
               <label
@@ -300,7 +299,7 @@ export function OpportunityForm({
               >
                 Tags{" "}
                 <span className="font-normal text-slate-400">
-                  · select existing or add your own
+                  · select all that apply
                 </span>
               </label>
               <div className="relative" ref={tagMenuRef}>
@@ -314,7 +313,7 @@ export function OpportunityForm({
                 >
                   <span className={tags.length > 0 ? "text-slate-900" : "text-slate-400"}>
                     {tags.length === 0
-                      ? "Select or add tags"
+                      ? "Select tags"
                       : `${tags.length} tag${tags.length === 1 ? "" : "s"} selected`}
                   </span>
                   <ChevronDown
@@ -326,61 +325,29 @@ export function OpportunityForm({
                 </button>
 
                 {tagMenuOpen ? (
-                  <div className="absolute z-20 mt-1 w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg">
-                    <div
-                      role="listbox"
-                      aria-multiselectable="true"
-                      aria-label="Tags"
-                      className="max-h-48 overflow-y-auto p-1"
-                    >
-                      {tagOptions.length === 0 ? (
-                        <p className="px-3 py-2 text-xs text-slate-500">
-                          No tags yet — add the first one below.
-                        </p>
-                      ) : (
-                        tagOptions.map((tag) => {
-                          const active = tags.includes(tag);
-                          return (
-                            <label
-                              key={tag}
-                              className="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
-                            >
-                              <input
-                                type="checkbox"
-                                checked={active}
-                                onChange={() => toggleTag(tag)}
-                                className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
-                              />
-                              {tag}
-                            </label>
-                          );
-                        })
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 border-t border-slate-100 p-2">
-                      <input
-                        type="text"
-                        value={tagInput}
-                        onChange={(event) => setTagInput(event.target.value)}
-                        onKeyDown={(event) => {
-                          if (event.key === "Enter" || event.key === ",") {
-                            event.preventDefault();
-                            addTag();
-                          }
-                        }}
-                        maxLength={30}
-                        placeholder="Add a new tag"
-                        aria-label="Add a new tag"
-                        className="min-w-0 flex-1 rounded-md border border-slate-300 bg-white px-2.5 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-brand-500"
-                      />
-                      <button
-                        type="button"
-                        onClick={addTag}
-                        className="shrink-0 rounded-md bg-brand-600 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
-                      >
-                        Add
-                      </button>
-                    </div>
+                  <div
+                    role="listbox"
+                    aria-multiselectable="true"
+                    aria-label="Tags"
+                    className="absolute z-20 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white p-1 shadow-lg"
+                  >
+                    {opportunityTags.map((tag) => {
+                      const active = tags.includes(tag);
+                      return (
+                        <label
+                          key={tag}
+                          className="flex cursor-pointer items-center gap-2.5 rounded-md px-3 py-2 text-sm text-slate-700 transition-colors hover:bg-slate-50"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={active}
+                            onChange={() => toggleTag(tag)}
+                            className="h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
+                          />
+                          {tag}
+                        </label>
+                      );
+                    })}
                   </div>
                 ) : null}
               </div>
@@ -405,7 +372,7 @@ export function OpportunityForm({
                   ))}
                 </div>
               ) : null}
-              <p className="text-xs text-slate-500">Up to 5 tags, 30 characters each.</p>
+              <p className="text-xs text-slate-500">Choose up to 5 tags.</p>
             </div>
 
             <div className="space-y-3">

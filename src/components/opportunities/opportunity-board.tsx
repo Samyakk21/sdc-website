@@ -288,10 +288,7 @@ export function OpportunityBoard({
       </div>
 
       {showForm ? (
-        <OpportunityForm
-          onClose={() => setShowForm(false)}
-          availableTags={allTags}
-        />
+        <OpportunityForm onClose={() => setShowForm(false)} />
       ) : null}
     </>
   );

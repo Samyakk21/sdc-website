@@ -6,7 +6,7 @@ export const initiatives: Initiative[] = [
     title: "Placements & Internships",
     shortTitle: "Placements",
     description:
-      "Connect with top companies and ace your interviews to land opportunities that launch your career.",
+      "Aid the CCD office to conduct placement and career related activities",
     status: "active",
   },
   {
@@ -31,6 +31,14 @@ export const initiatives: Initiative[] = [
     shortTitle: "MUN",
     description:
       "To cultivate a generation of informed, empathetic, and dynamic leaders.",
+    status: "active",
+  },
+  {
+    slug: "ylac-policy-collective",
+    title: "YLAC Policy Collective — IISER Bhopal Chapter",
+    shortTitle: "YLAC Policy",
+    description:
+      "A student-led chapter of the YLAC Policy Collective, building public-policy awareness through dialogue, research, and civic engagement.",
     status: "active",
   },
   {
