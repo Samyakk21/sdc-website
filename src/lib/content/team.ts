@@ -46,7 +46,7 @@ export const teamGroups: TeamGroup[] = [
     title: "OVERSEERS",
     members: [
       t("Samyak", "TECH Wing", "/images/team/samyak.jpg", {
-        quote: "Figuring out how to figure out!",
+        quote: "hope does not come without cost",
         linkedin: "https://www.linkedin.com/in/samyak07/",
         email: "samyak25@iiserb.ac.in",
       }),
@@ -76,7 +76,7 @@ export const teamGroups: TeamGroup[] = [
     title: "Core Committee",
     members: [
       t("Raman Ghame", "PR and Content", "/images/team/raman.JPG", {
-        quote: "Slightly unhinged, mostly intentional",
+        quote: "Overthinking is my cardio.",
         linkedin: "https://www.linkedin.com/in/raman-ghame-a33014329/",
         email: "raman24@iiserb.ac.in",
       }),
