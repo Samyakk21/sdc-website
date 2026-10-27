@@ -36,7 +36,7 @@ export const teamGroups: TeamGroup[] = [
     title: "Secretary",
     members: [
       t("Mattupalli Karthik", "Secretary", "/images/team/karthik.jpg", {
-        quote: "Give yourself a pat on your back whenever you good.",
+        quote: "Give yourself a pat on your back whenever you do good.",
         linkedin: "https://www.linkedin.com/in/karthikmattupalli/",
         email: "mattupalli24@iiserb.ac.in",
       }),
