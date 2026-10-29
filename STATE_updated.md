@@ -1,5 +1,5 @@
 # SDC Website — Project State
-**Last Updated:** 2026-10-25
+**Last Updated:** 2026-10-29
 
 ## Project Overview
 - **Project Name:** SDC Website
@@ -216,3 +216,24 @@ users, roles (via role column on users), events, registrations, attendance (sche
 - **Anonymous posting (2026-10-27):** added a "Post anonymously" checkbox. Posts always record `submitted_by` and the `contributor_name` snapshot so per-user upvote totals still work, while `is_anonymous` hides the name on the board (cards read "Shared anonymously"). The board and share action tolerate the column being absent, and `20261027000000_opportunity_anonymous.sql` adds both `is_anonymous` and `contributor_name` (plus a profile backfill) so one paste is enough. Verified locally: board renders with the live project, `is_anonymous` fallback logs a warning.
 
 - **Sign-in failures from the protected Vercel alias (2026-10-27):** users were landing on `sdc-website-samyakk21.vercel.app` (Supabase's Site URL fallback) and hitting Vercel Deployment Protection instead of the app. Fixes: (1) project `ssoProtection.deploymentType` set to `preview`, so production aliases are public while previews stay protected; (2) `updateSession` now 307s the project's Vercel aliases to the canonical `NEXT_PUBLIC_SITE_URL` host, preserving query (so `?code` reaches `/auth/callback` with the PKCE cookie); (3) a stray `?code` on any other path is routed to `/auth/callback`. README now documents the correct Google redirect URI and the exact Site URL / Redirect URLs to use. Deployed and verified: alias → canonical redirect works, canonical `/login` 200.
+
+- **Image diet (2026-10-29):** removed 20 unreferenced images (9.8 MB) — including `team/amritash.heic` (8.1 MB), the previous committee's portraits that are no longer on the 2026–27 team page, and the unused `climate.jpeg` — after mapping every `/images/…` reference in `src`. Re-encoded the 16 referenced photos (`amritash.jpg` 5.6 MB, `naman.jpg` 3.7 MB, `arko.jpg` 2.8 MB, `raman.JPG` 1.6 MB, `aarushi2.jpeg` 1.1 MB, etc.) with EXIF orientation applied, team portraits capped at 900 px, the hero at 1600 px, JPEG q82/progressive, and PNG optimisation. `public/` dropped from 27 MB to 1.9 MB; verified every remaining reference resolves.
+
+## Performance & Polish Roadmap (2026-10-29)
+
+**Execution rule:** one task per commit, committed with `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` set to the task's date, pushed to `main`, then wait for "next". Only YES items are scheduled; NO items are ignored. Dates advance one day per finished task (Oct 29, Oct 30, Nov 1, … since October ends on the 30th).
+
+**Delivery plan:** PR 1 — items 2, 3, 4 plus the region check. PR 2 — item 1 plus the safe parts of 5 and 9. PR 3 — items 10 and 11. Measure TTFB after each PR before starting the next.
+
+### Checklist
+
+- [x] **1. Image diet — 2026-10-29.** Compressed referenced photos and removed the 20 unused ones; `public/` is now 1.9 MB.
+- [ ] **2. Remove auth from the public render path — 2026-10-30.** Keep the proxy on all routes with the cheap checks first; it also does the canonical-domain redirect, the `?code` OAuth rescue, and cookie refresh. Switch read-only checks (proxy, layout, navbar) from `getUser()` to `getClaims()` — only if the Supabase project uses asymmetric JWT signing keys; keep `getUser()` in write actions. Wrap `getCurrentSession()` in `React.cache()`. Leave the navbar Suspense split for item 10.
+- [ ] **3. Parallelise event detail — 2026-11-01.** Wrap `fetchEventRow` in `React.cache()` so `generateMetadata`, the page and `getEventRow` share one fetch; run `getMyRegistration` and `getSeatsFilled` in `Promise.all`; add `mode` to the `fetchEventRow` select (hybrid events currently render "On campus"). Also parallelise `/opportunities` (list + votes) and `/dashboard` (registrations + `listEvents()`).
+- [ ] **4. Suspense and loading.tsx — 2026-11-02.** Add `loading.tsx` for `/events`, `/opportunities`, `/team`, `/dashboard`, `/admin`. On home and `/events`, render the hero and headers first and wrap the `listEvents()` sections in `<Suspense>` with simple skeletons.
+- [ ] **5. Responsive fixes (safe parts) — 2026-11-03.** Replace the always-on navbar `backdrop-blur` with a solid background (or blur only after scroll); replace the deprecated `priority` prop on `LogoMark`; change the raw `<a>` in admin `EmptyState` to `Link`; after confirming the clipping, wrap the admin tables in `overflow-x-auto`. Navbar breakpoint: only move the desktop nav to `xl` if the links overlap at 1024–1280 px in a real test. Do not change the hero text scale (48 px fits a 360 px phone).
+- [ ] **9. Smooth scroll, scroll-padding-top, text-wrap — 2026-11-04.** Set `scroll-padding-top` to ~5rem for the sticky header (`/events#announcements` currently lands under it); add `scroll-behavior: smooth` behind `prefers-reduced-motion: no-preference`; add `text-wrap: balance` on headings; add `data-scroll-behavior="smooth"` to `<html>` if Next warns.
+- [ ] **10. Cache Components + PPR — 2026-11-05.** Separate PR: enable `cacheComponents` in Next 16; put the session-dependent navbar slot behind `<Suspense>`; cache public event/resource reads with `use cache`, `cacheLife` and `cacheTag` using a cookie-free anon Supabase client (requires public RLS reads); switch admin actions from `revalidatePath` to tag-based invalidation; test on a Vercel preview deploy.
+- [ ] **11. Partial prefetching — 2026-11-06.** Only after item 10; follow the Next 16.3 docs for the flag and verify instant navigation on a preview deploy.
+
+**Not scheduled (NO):** 6 scroll-reveal, 7 view transitions, 8 full-screen mobile menu, 12 DB index audit (indexes already exist), 13 bundle analysis (small dependency set, 12 client components).
