@@ -1,5 +1,5 @@
 # SDC Website — Project State
-**Last Updated:** 2026-10-29
+**Last Updated:** 2026-10-30
 
 ## Project Overview
 - **Project Name:** SDC Website
@@ -219,6 +219,8 @@ users, roles (via role column on users), events, registrations, attendance (sche
 
 - **Image diet (2026-10-29):** removed 20 unreferenced images (9.8 MB) — including `team/amritash.heic` (8.1 MB), the previous committee's portraits that are no longer on the 2026–27 team page, and the unused `climate.jpeg` — after mapping every `/images/…` reference in `src`. Re-encoded the 16 referenced photos (`amritash.jpg` 5.6 MB, `naman.jpg` 3.7 MB, `arko.jpg` 2.8 MB, `raman.JPG` 1.6 MB, `aarushi2.jpeg` 1.1 MB, etc.) with EXIF orientation applied, team portraits capped at 900 px, the hero at 1600 px, JPEG q82/progressive, and PNG optimisation. `public/` dropped from 27 MB to 1.9 MB; verified every remaining reference resolves.
 
+- **Public auth path (2026-10-30):** confirmed the Supabase project signs JWTs with asymmetric keys — the project JWKS returns one ES256 P-256 key — so `getClaims()` verifies locally. The proxy now uses `getClaims()` (it still refreshes an expiring session and writes rotated cookies through the adapter) and keeps its cheap checks first: canonical-host redirect, env no-op, `?code` OAuth rescue, then the auth check. `getCurrentSession()` is wrapped in `React.cache()` and shared by the marketing/dashboard/admin layouts and read-only pages, so the navbar session comes from that single cached lookup. Added `getVerifiedSession()` (still `getUser()`) for every write path: opportunity create/upvote, event register/cancel, and `requireAdmin()` (which every admin action calls). The navbar Suspense split stays deferred to item 10. Verified: `/team`, `/events`, `/opportunities`, `/login` all 200 (`/team` ~50 ms TTFB warm), garbage/expired session cookies degrade to the login redirect instead of erroring, and `/dashboard`, `/admin`, and stray `?code` redirects are unchanged.
+
 ## Performance & Polish Roadmap (2026-10-29)
 
 **Execution rule:** one task per commit, committed with `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` set to the task's date, pushed to `main`, then wait for "next". Only YES items are scheduled; NO items are ignored. Dates advance one day per finished task (Oct 29, Oct 30, Nov 1, … since October ends on the 30th).
@@ -228,7 +230,7 @@ users, roles (via role column on users), events, registrations, attendance (sche
 ### Checklist
 
 - [x] **1. Image diet — 2026-10-29.** Compressed referenced photos and removed the 20 unused ones; `public/` is now 1.9 MB.
-- [ ] **2. Remove auth from the public render path — 2026-10-30.** Keep the proxy on all routes with the cheap checks first; it also does the canonical-domain redirect, the `?code` OAuth rescue, and cookie refresh. Switch read-only checks (proxy, layout, navbar) from `getUser()` to `getClaims()` — only if the Supabase project uses asymmetric JWT signing keys; keep `getUser()` in write actions. Wrap `getCurrentSession()` in `React.cache()`. Leave the navbar Suspense split for item 10.
+- [x] **2. Remove auth from the public render path — 2026-10-30.** Asymmetric ES256 keys confirmed via the project JWKS; proxy and the cached `getCurrentSession()` now use `getClaims()`; `getVerifiedSession()` keeps `getUser()` on all write paths. Navbar Suspense split left for item 10.
 - [ ] **3. Parallelise event detail — 2026-11-01.** Wrap `fetchEventRow` in `React.cache()` so `generateMetadata`, the page and `getEventRow` share one fetch; run `getMyRegistration` and `getSeatsFilled` in `Promise.all`; add `mode` to the `fetchEventRow` select (hybrid events currently render "On campus"). Also parallelise `/opportunities` (list + votes) and `/dashboard` (registrations + `listEvents()`).
 - [ ] **4. Suspense and loading.tsx — 2026-11-02.** Add `loading.tsx` for `/events`, `/opportunities`, `/team`, `/dashboard`, `/admin`. On home and `/events`, render the hero and headers first and wrap the `listEvents()` sections in `<Suspense>` with simple skeletons.
 - [ ] **5. Responsive fixes (safe parts) — 2026-11-03.** Replace the always-on navbar `backdrop-blur` with a solid background (or blur only after scroll); replace the deprecated `priority` prop on `LogoMark`; change the raw `<a>` in admin `EmptyState` to `Link`; after confirming the clipping, wrap the admin tables in `overflow-x-auto`. Navbar breakpoint: only move the desktop nav to `xl` if the links overlap at 1024–1280 px in a real test. Do not change the hero text scale (48 px fits a 360 px phone).

@@ -9,8 +9,10 @@ export function hasSupabaseEnv() {
 
 /**
  * Server-side Supabase client bound to the request's cookie store.
- * Call `supabase.auth.getUser()` (not `getSession()`) to validate sessions —
- * it verifies the JWT with Supabase on every call.
+ * For read-only checks use `supabase.auth.getClaims()` (verified locally with
+ * the project's asymmetric signing keys). For write paths use
+ * `supabase.auth.getUser()`, which verifies the token with Supabase on every
+ * call. Never call `getSession()` to authorise a request.
  */
 export async function createClient() {
   if (!hasSupabaseEnv()) {

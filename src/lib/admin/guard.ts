@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getCurrentSession } from "@/lib/auth";
+import { getVerifiedSession } from "@/lib/auth";
 
 export type AdminProfile = {
   id: string;
@@ -16,7 +16,7 @@ export type AdminProfile = {
  * Defense-in-depth on top of the proxy.ts route gate and RLS.
  */
 export async function requireAdmin(): Promise<AdminProfile> {
-  const session = await getCurrentSession();
+  const session = await getVerifiedSession();
   if (!session) {
     redirect("/login?next=/admin");
   }

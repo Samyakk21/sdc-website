@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
-import { getCurrentSession } from "@/lib/auth";
+import { getVerifiedSession } from "@/lib/auth";
 import { getEventRow, getSeatsFilled } from "@/lib/events-repo";
 
 export type RegistrationState = {
@@ -42,7 +42,7 @@ export async function registerForEvent(
     return { ok: false, message: "Registration isn't available yet." };
   }
 
-  const session = await getCurrentSession();
+  const session = await getVerifiedSession();
   if (!session) return { ok: false, message: "Sign in to register for events." };
 
   const row = await getEventRow(slug);
@@ -100,7 +100,7 @@ export async function cancelRegistration(
     return { ok: false, message: "Registration isn't available yet." };
   }
 
-  const session = await getCurrentSession();
+  const session = await getVerifiedSession();
   if (!session) return { ok: false, message: "Sign in to manage your registrations." };
 
   const row = await getEventRow(slug);

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getCurrentSession } from "@/lib/auth";
+import { getVerifiedSession } from "@/lib/auth";
 import {
   departments,
   opportunityTags,
@@ -33,7 +33,7 @@ export async function createOpportunity(
     return { ok: false, message: "Submissions are unavailable right now. Please try again later." };
   }
 
-  const session = await getCurrentSession();
+  const session = await getVerifiedSession();
   if (!session) {
     return { ok: false, message: "Sign in with your IISER Bhopal account to share an opportunity." };
   }
@@ -164,7 +164,7 @@ export async function toggleOpportunityVote(
     return { ok: false, message: "Voting is unavailable right now." };
   }
 
-  const session = await getCurrentSession();
+  const session = await getVerifiedSession();
   if (!session) {
     return { ok: false, message: "Sign in with your IISER Bhopal account to vote." };
   }

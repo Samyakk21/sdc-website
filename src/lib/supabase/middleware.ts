@@ -94,16 +94,21 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // The project uses asymmetric JWT signing keys (ES256), so getClaims()
+  // verifies the token locally. It still refreshes an expiring session and
+  // writes the rotated cookies through the adapter above.
+  const { data: claimsData, error: claimsError } =
+    await supabase.auth.getClaims();
+  const claims = claimsError ? null : claimsData?.claims;
+  const userId = typeof claims?.sub === "string" ? claims.sub : null;
+  const email = typeof claims?.email === "string" ? claims.email : undefined;
 
   const { pathname, origin } = request.nextUrl;
   const isProtected =
     pathname.startsWith("/dashboard") || pathname.startsWith("/admin");
   const isLoginPage = pathname === "/login";
 
-  const signedIn = !!user && isAllowedEmail(user.email);
+  const signedIn = !!userId && isAllowedEmail(email);
 
   if (!signedIn) {
     if (isProtected) {
@@ -122,7 +127,7 @@ export async function updateSession(request: NextRequest) {
     const { data: profile } = await supabase
       .from("users")
       .select("role")
-      .eq("id", user.id)
+      .eq("id", userId)
       .maybeSingle();
 
     if (
