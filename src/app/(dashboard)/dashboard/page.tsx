@@ -34,12 +34,17 @@ export default async function DashboardPage() {
 
   const supabase = await createClient();
 
-  const { data: registrations } = await supabase
-    .from("registrations")
-    .select("registered_at, events(*)")
-    .eq("user_id", session.profile.id)
-    .eq("status", "registered")
-    .order("registered_at", { ascending: false });
+  // The two reads are independent: fetch the caller's registrations and the
+  // open-events catalog together.
+  const [{ data: registrations }, allEvents] = await Promise.all([
+    supabase
+      .from("registrations")
+      .select("registered_at, events(*)")
+      .eq("user_id", session.profile.id)
+      .eq("status", "registered")
+      .order("registered_at", { ascending: false }),
+    listEvents(),
+  ]);
 
   const myRows = ((registrations as RegisteredRow[] | null) ?? [])
     .map((r) => r.events)
@@ -54,7 +59,7 @@ export default async function DashboardPage() {
     .filter((e) => new Date(`${e.date}T${e.endTime ?? "23:59"}`).getTime() < nowMs)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-  const openEvents = (await listEvents())
+  const openEvents = allEvents
     .filter((e) => isEventOpen(e))
     .filter((e) => !myRows.some((m) => m.slug === e.slug))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())

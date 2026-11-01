@@ -1,3 +1,5 @@
+import { cache } from "react";
+
 import type { SDCEvent, EventMode } from "@/lib/types";
 import { events as staticEvents, getEvent as getStaticEvent } from "@/lib/content/events";
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
@@ -85,19 +87,23 @@ export async function listEvents(): Promise<SDCEvent[]> {
   return staticEvents;
 }
 
-async function fetchEventRow(slug: string): Promise<EventRow | null> {
+/**
+ * One row per slug per request. `generateMetadata`, the page and `getEvent()`
+ * all call this, so React.cache() turns those into a single query.
+ */
+const fetchEventRow = cache(async (slug: string): Promise<EventRow | null> => {
   if (!hasSupabaseEnv()) return null;
 
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("events")
-    .select("id, slug, title, tagline, description, status, starts_at, ends_at, is_online, location, capacity, registration_deadline, organizer")
+    .select("id, slug, title, tagline, description, status, starts_at, ends_at, is_online, mode, location, capacity, registration_deadline, organizer")
     .eq("slug", slug)
     .maybeSingle();
 
   if (error || !data) return null;
   return data as EventRow;
-}
+});
 
 export async function getEvent(slug: string): Promise<SDCEvent | null> {
   const row = await fetchEventRow(slug);

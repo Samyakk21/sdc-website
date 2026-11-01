@@ -54,11 +54,14 @@ export function generateMetadata({ params }: PageProps<"/events/[slug]">): Promi
 
 export default async function EventPage({ params }: PageProps<"/events/[slug]">) {
   const { slug } = await params;
-  const event = await getEvent(slug);
+  // getEvent() and getEventRow() share one cached fetchEventRow(); the session
+  // check runs alongside them instead of adding a round trip.
+  const [event, session, row] = await Promise.all([
+    getEvent(slug),
+    getCurrentSession(),
+    getEventRow(slug),
+  ]);
   if (!event) notFound();
-
-  const session = await getCurrentSession();
-  const row = await getEventRow(slug);
 
   const meta = eventStatusMeta[event.status];
   const open = isEventOpen(event);
@@ -67,9 +70,15 @@ export default async function EventPage({ params }: PageProps<"/events/[slug]">)
 
   const deadlinePast = isDeadlinePast(event.registrationDeadline);
 
-  const registration = row && session ? await getMyRegistration(row.id, session.profile.id) : null;
+  // Independent lookups: fetch the caller's registration and the seat count
+  // together.
+  const [registration, seatsFilled] = await Promise.all([
+    row && session
+      ? getMyRegistration(row.id, session.profile.id)
+      : Promise.resolve(null),
+    row && event.capacity != null ? getSeatsFilled(row.id) : Promise.resolve(0),
+  ]);
   const registered = registration?.status === "registered";
-  const seatsFilled = row && event.capacity != null ? await getSeatsFilled(row.id) : 0;
 
   let panel: React.ReactNode = null;
 

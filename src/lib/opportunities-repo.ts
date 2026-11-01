@@ -61,18 +61,34 @@ export async function listOpportunities(
       .select([...requiredOpportunityColumns, ...optional].join(", "))
       .order("created_at", { ascending: false });
 
-  const optional: string[] = [...optionalOpportunityColumns];
-  let opportunitiesResult = await fetchRows(optional);
+  const fetchRowsWithFallback = async () => {
+    const optional: string[] = [...optionalOpportunityColumns];
+    let result = await fetchRows(optional);
 
-  while (opportunitiesResult.error) {
-    const missing = missingOptionalColumn(opportunitiesResult.error);
-    if (!missing) break;
-    console.warn(
-      `opportunities.${missing} is missing; run supabase/migrations/20261027000000_opportunity_anonymous.sql to enable it.`,
-    );
-    optional.splice(optional.indexOf(missing), 1);
-    opportunitiesResult = await fetchRows(optional);
-  }
+    while (result.error) {
+      const missing = missingOptionalColumn(result.error);
+      if (!missing) break;
+      console.warn(
+        `opportunities.${missing} is missing; run supabase/migrations/20261027000000_opportunity_anonymous.sql to enable it.`,
+      );
+      optional.splice(optional.indexOf(missing), 1);
+      result = await fetchRows(optional);
+    }
+
+    return { result, optional };
+  };
+
+  // The caller's votes don't depend on the rows, so start both queries
+  // together instead of waiting for the board before the vote lookup.
+  const votesQuery = userId
+    ? supabase
+        .from("opportunity_votes")
+        .select("opportunity_id")
+        .eq("user_id", userId)
+    : null;
+
+  const [{ result: opportunitiesResult, optional }, votesResult] =
+    await Promise.all([fetchRowsWithFallback(), votesQuery]);
 
   if (opportunitiesResult.error) {
     if (isMissingSchemaError(opportunitiesResult.error.code)) {
@@ -82,22 +98,17 @@ export async function listOpportunities(
     throw new Error(`Could not load opportunities: ${opportunitiesResult.error.message}`);
   }
 
-  let votedIds = new Set<string>();
-  if (userId) {
-    const votesResult = await supabase
-      .from("opportunity_votes")
-      .select("opportunity_id")
-      .eq("user_id", userId);
-
-    if (votesResult.error) {
-      if (isMissingSchemaError(votesResult.error.code)) {
-        console.error("The opportunity votes migration has not been applied:", votesResult.error);
-        return { opportunities: [], status: "migration-required" };
-      }
-      throw new Error(`Could not load opportunity votes: ${votesResult.error.message}`);
+  if (votesResult?.error) {
+    if (isMissingSchemaError(votesResult.error.code)) {
+      console.error("The opportunity votes migration has not been applied:", votesResult.error);
+      return { opportunities: [], status: "migration-required" };
     }
-    votedIds = new Set(votesResult.data.map((vote) => vote.opportunity_id));
+    throw new Error(`Could not load opportunity votes: ${votesResult.error.message}`);
   }
+
+  const votedIds = new Set(
+    (votesResult?.data ?? []).map((vote) => vote.opportunity_id),
+  );
 
   return {
     opportunities: ((opportunitiesResult.data ?? []) as unknown as OpportunityRow[]).map((opportunity) => ({
