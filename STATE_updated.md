@@ -1,5 +1,5 @@
 # SDC Website — Project State
-**Last Updated:** 2026-11-01
+**Last Updated:** 2026-11-02
 
 ## Project Overview
 - **Project Name:** SDC Website
@@ -225,18 +225,22 @@ users, roles (via role column on users), events, registrations, attendance (sche
 
 - **Query consolidation (2026-11-01):** `fetchEventRow()` is wrapped in `React.cache()`, so `generateMetadata`, the page, `getEvent()` and `getEventRow()` now share one row fetch per request; `mode` was added to that select so hybrid events no longer render as "On campus". The event page now loads `getEvent`, `getCurrentSession` and `getEventRow` together and runs `getMyRegistration` + `getSeatsFilled` in `Promise.all`; `/opportunities` starts the caller's votes query alongside the rows (optional-column fallback intact); `/dashboard` runs the registrations query and `listEvents()` together. Verified with a temporary session (magic-link exchange, revoked afterwards): `/team` shows the navbar name, `/dashboard` renders "Hi, Samyak", `/admin` loads for the super admin, the event page shows the register panel, and an expired access token with a valid refresh token rotated its cookies (two `Set-Cookie` chunks) while staying signed in. Real Google sign-in and a register/cancel round trip still need a human browser check.
 
+- **Loading states & streaming (2026-11-02):** added `loading.tsx` for `/events`, `/opportunities`, `/team`, `/dashboard` and `/admin`, plus a detail-specific one for `/events/[slug]`, all built from a shared skeleton set (`src/components/ui/skeleton.tsx`; `motion-reduce:animate-none` respected). The home page and `/events` now render their hero/header and static content immediately, with only the `listEvents()` sections wrapped in `<Suspense>` — home streams `UpcomingEventsSection` behind `EventsSectionSkeleton`; `/events` streams the open/concluded lists while the static announcements stay in the shell. Local streaming check on a production build: home first byte 0.15 s and `/events` 0.03 s, with cards arriving after. PR 1 closes with this task: live warm TTFB on the `syd1` deployment is ~0.39–0.49 s for `/team`, `/events`, event details and `/opportunities` (down from 1.6–2.5 s on `iad1`). Trade-off accepted from item 2: `getClaims()` cannot see revocations, so a signed-out or banned user keeps read access until the JWT expires; every write path and the admin guard still call `getUser()`.
+
 ## Performance & Polish Roadmap (2026-10-29)
 
 **Execution rule:** one task per commit, committed with `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` set to the task's date, pushed to `main`, then wait for "next". Only YES items are scheduled; NO items are ignored. Dates advance one day per finished task (Oct 29, Oct 30, Nov 1, … since October ends on the 30th).
 
 **Delivery plan:** PR 1 — items 2, 3, 4 plus the region check. PR 2 — item 1 plus the safe parts of 5 and 9. PR 3 — items 10 and 11. Measure TTFB after each PR before starting the next.
 
+**Region check (PR 1):** done 2026-11-01 — `vercel.json` pins functions to `syd1`, matching the database's Sydney (`ap-southeast-2`) location.
+
 ### Checklist
 
 - [x] **1. Image diet — 2026-10-29.** Compressed referenced photos and removed the 20 unused ones; `public/` is now 1.9 MB.
 - [x] **2. Remove auth from the public render path — 2026-10-30.** Asymmetric ES256 keys confirmed via the project JWKS; proxy and the cached `getCurrentSession()` now use `getClaims()`; `getVerifiedSession()` keeps `getUser()` on all write paths. Navbar Suspense split left for item 10.
 - [x] **3. Parallelise event detail — 2026-11-01.** `fetchEventRow` is `React.cache()`-wrapped (one fetch shared by metadata, page, `getEvent`, `getEventRow`) and now selects `mode`; event-detail registration + seats, `/opportunities` rows + votes, and `/dashboard` registrations + `listEvents()` all run in parallel.
-- [ ] **4. Suspense and loading.tsx — 2026-11-02.** Add `loading.tsx` for `/events`, `/opportunities`, `/team`, `/dashboard`, `/admin`. On home and `/events`, render the hero and headers first and wrap the `listEvents()` sections in `<Suspense>` with simple skeletons.
+- [x] **4. Suspense and loading.tsx — 2026-11-02.** `loading.tsx` added for `/events` (+ `/events/[slug]`), `/opportunities`, `/team`, `/dashboard`, `/admin`; home and `/events` stream their DB-backed sections under `<Suspense>` with skeletons while headers/static content paint first.
 - [ ] **5. Responsive fixes (safe parts) — 2026-11-03.** Replace the always-on navbar `backdrop-blur` with a solid background (or blur only after scroll); replace the deprecated `priority` prop on `LogoMark`; change the raw `<a>` in admin `EmptyState` to `Link`; after confirming the clipping, wrap the admin tables in `overflow-x-auto`. Navbar breakpoint: only move the desktop nav to `xl` if the links overlap at 1024–1280 px in a real test. Do not change the hero text scale (48 px fits a 360 px phone).
 - [ ] **9. Smooth scroll, scroll-padding-top, text-wrap — 2026-11-04.** Set `scroll-padding-top` to ~5rem for the sticky header (`/events#announcements` currently lands under it); add `scroll-behavior: smooth` behind `prefers-reduced-motion: no-preference`; add `text-wrap: balance` on headings; add `data-scroll-behavior="smooth"` to `<html>` if Next warns.
 - [ ] **10. Cache Components + PPR — 2026-11-05.** Separate PR: enable `cacheComponents` in Next 16; put the session-dependent navbar slot behind `<Suspense>`; cache public event/resource reads with `use cache`, `cacheLife` and `cacheTag` using a cookie-free anon Supabase client (requires public RLS reads); switch admin actions from `revalidatePath` to tag-based invalidation; test on a Vercel preview deploy.

@@ -5,6 +5,7 @@ import { SectionHeader } from "@/components/ui/section-heading";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { EventCard } from "@/components/events/event-card";
+import { EventGridSkeleton } from "@/components/ui/skeleton";
 import type { SDCEvent } from "@/lib/types";
 
 export function EventsSection({ events, limit = 3 }: { events: SDCEvent[]; limit?: number }) {
@@ -40,6 +41,22 @@ export function EventsSection({ events, limit = 3 }: { events: SDCEvent[]; limit
             />
           </div>
         )}
+      </Container>
+    </section>
+  );
+}
+
+/** Matches EventsSection's frame so the hero and static sections can paint first. */
+export function EventsSectionSkeleton() {
+  return (
+    <section className="bg-white py-16 sm:py-20" aria-hidden>
+      <Container>
+        <SectionHeader
+          eyebrow="Events"
+          title="Upcoming events"
+          description="Talks, workshops, and sessions you can attend now."
+        />
+        <EventGridSkeleton count={3} className="mt-10" />
       </Container>
     </section>
   );
