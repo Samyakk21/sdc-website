@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { PageHeader } from "@/components/ui/page-header";
 import { Container } from "@/components/ui/container";
@@ -82,12 +83,12 @@ export default async function AdminOverviewPage() {
             title="No upcoming events yet"
             description="Create your first event from the Events section to get started."
             action={
-              <a
+              <Link
                 href="/admin/events/new"
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700"
               >
                 Create event
-              </a>
+              </Link>
             }
           />
         </div>

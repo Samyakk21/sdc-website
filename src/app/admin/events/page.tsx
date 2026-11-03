@@ -59,7 +59,7 @@ export default async function AdminEventsListPage() {
         ) : null}
 
         {rows.length > 0 ? (
-          <div className="mt-8 rounded-xl border border-slate-200 bg-white overflow-hidden">
+          <div className="mt-8 overflow-x-auto rounded-xl border border-slate-200 bg-white">
             <table className="w-full text-sm text-slate-600">
               <thead>
                 <tr className="bg-slate-50 text-slate-900 text-xs uppercase tracking-wider">

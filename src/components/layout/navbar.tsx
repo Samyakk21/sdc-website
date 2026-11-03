@@ -48,16 +48,16 @@ export function Navbar({ session }: { session: NavbarSession }) {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-slate-200 bg-white">
       <nav
-        className="mx-auto flex h-16 w-full max-w-[96rem] items-center justify-between gap-4 px-4 sm:px-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:justify-items-center lg:px-8"
+        className="mx-auto flex h-16 w-full max-w-[96rem] items-center justify-between gap-4 px-4 sm:px-6 xl:grid xl:grid-cols-[1fr_auto_1fr] xl:justify-items-center xl:px-8"
         aria-label="Main"
       >
         <div className="justify-self-start">
           <Brand />
         </div>
 
-        <ul className="hidden items-center gap-0.5 lg:flex">
+        <ul className="hidden items-center gap-0.5 xl:flex">
           {navLinks.map((link) => {
             const active = isActive(link.href);
             return (
@@ -123,7 +123,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
           <button
             type="button"
             onClick={() => setOpen(!open)}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate-700 hover:bg-slate-100 lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate-700 hover:bg-slate-100 xl:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -134,7 +134,7 @@ export function Navbar({ session }: { session: NavbarSession }) {
       </nav>
 
       {open ? (
-        <div id="mobile-menu" className="border-t border-slate-200 bg-white lg:hidden">
+        <div id="mobile-menu" className="border-t border-slate-200 bg-white xl:hidden">
           <ul className="mx-auto flex w-full max-w-[96rem] flex-col gap-1 px-4 py-4">
             {navLinks.map((link) => {
               const active = isActive(link.href);

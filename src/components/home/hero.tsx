@@ -37,7 +37,7 @@ export function Hero() {
           <div className="relative">
             <div className="absolute -inset-6 -z-10 rounded-full bg-gradient-to-br from-brand-100 to-ink-100 blur-2xl" aria-hidden />
             <LogoMark
-              priority
+              preload
               className="logo-chip h-72 w-72 rounded-full bg-white p-2 shadow-xl ring-8 ring-white/70 sm:h-80 sm:w-80 sm:p-3 lg:h-96 lg:w-96 lg:p-4"
             />
           </div>

@@ -3,11 +3,11 @@ import Image from "next/image";
 export function LogoMark({
   className = "",
   alt = "SDC emblem",
-  priority = false,
+  preload = false,
 }: {
   className?: string;
   alt?: string;
-  priority?: boolean;
+  preload?: boolean;
 }) {
   return (
     <Image
@@ -16,7 +16,7 @@ export function LogoMark({
       width={1402}
       height={1404}
       unoptimized
-      priority={priority}
+      preload={preload}
       className={className}
     />
   );
