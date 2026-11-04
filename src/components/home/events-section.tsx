@@ -5,7 +5,7 @@ import { SectionHeader } from "@/components/ui/section-heading";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { EventCard } from "@/components/events/event-card";
-import { EventGridSkeleton } from "@/components/ui/skeleton";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { SDCEvent } from "@/lib/types";
 
 export function EventsSection({ events, limit = 3 }: { events: SDCEvent[]; limit?: number }) {
@@ -56,7 +56,7 @@ export function EventsSectionSkeleton() {
           title="Upcoming events"
           description="Talks, workshops, and sessions you can attend now."
         />
-        <EventGridSkeleton count={3} className="mt-10" />
+        <Skeleton className="mt-10 h-64 w-full rounded-xl" />
       </Container>
     </section>
   );

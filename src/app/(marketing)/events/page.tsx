@@ -8,7 +8,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { EventCard } from "@/components/events/event-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { EventGridSkeleton, LoadingLabel, Skeleton } from "@/components/ui/skeleton";
+import { LoadingLabel, Skeleton } from "@/components/ui/skeleton";
 import { listEvents } from "@/lib/events-repo";
 import { eventPhase } from "@/lib/event-status";
 import { announcements } from "@/lib/content/announcements";
@@ -146,7 +146,7 @@ function EventsListsSkeleton() {
       <Skeleton className="h-3 w-24" />
       <Skeleton className="mt-3 h-8 w-80 max-w-full" />
       <Skeleton className="mt-3 h-4 w-full max-w-xl" />
-      <EventGridSkeleton count={3} />
+      <Skeleton className="mt-8 h-64 w-full rounded-xl" />
     </section>
   );
 }
