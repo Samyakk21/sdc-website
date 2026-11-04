@@ -1,5 +1,5 @@
 import { Container } from "@/components/ui/container";
-import { EventGridSkeleton, LoadingLabel, Skeleton } from "@/components/ui/skeleton";
+import { LoadingLabel, Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardLoading() {
   return (
@@ -20,7 +20,7 @@ export default function DashboardLoading() {
           <Skeleton className="h-3 w-20" />
           <Skeleton className="mt-3 h-7 w-64 max-w-full" />
           <Skeleton className="mt-3 h-4 w-full max-w-xl" />
-          <EventGridSkeleton count={3} />
+          <Skeleton className="mt-8 h-72 w-full rounded-xl" />
         </section>
       </Container>
     </>

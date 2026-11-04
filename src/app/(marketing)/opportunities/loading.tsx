@@ -1,6 +1,6 @@
 import { Container } from "@/components/ui/container";
 import { PageHeader } from "@/components/ui/page-header";
-import { LoadingLabel, OpportunityCardSkeleton, Skeleton } from "@/components/ui/skeleton";
+import { LoadingLabel, Skeleton } from "@/components/ui/skeleton";
 
 export default function OpportunitiesLoading() {
   return (
@@ -33,13 +33,7 @@ export default function OpportunitiesLoading() {
             <Skeleton className="h-6 w-16 rounded-full" />
           </div>
 
-          <ul className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <li key={index} className="min-w-0">
-                <OpportunityCardSkeleton />
-              </li>
-            ))}
-          </ul>
+          <Skeleton className="h-72 w-full rounded-xl" />
         </div>
       </Container>
     </>
