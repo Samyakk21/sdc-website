@@ -1,5 +1,5 @@
 # SDC Website — Project State
-**Last Updated:** 2026-11-03
+**Last Updated:** 2026-11-04
 
 ## Project Overview
 - **Project Name:** SDC Website
@@ -231,6 +231,8 @@ _Update 2026-11-03: the user confirmed real Google sign-in and a register/cancel
 
 - **Responsive fixes (2026-11-03):** solid navbar (no permanent blur), `LogoMark` migrated to `preload`, admin overview's empty-state action uses `Link`, admin tables scroll horizontally, and the desktop nav now starts at `xl` — the row plus brand/session controls overflowed at 1024–1280 px. Hero type scale unchanged.
 
+- **Scroll & typography polish (2026-11-04):** anchors now stop 5rem below the viewport top instead of hiding under the sticky header; smooth scrolling only for visitors without `prefers-reduced-motion: reduce`; headings balance their line lengths; `data-scroll-behavior="smooth"` keeps SPA route changes from animating a long scroll.
+
 ## Performance & Polish Roadmap (2026-10-29)
 
 **Execution rule:** one task per commit, committed with `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` set to the task's date, pushed to `main`, then wait for "next". Only YES items are scheduled; NO items are ignored. Dates advance one day per finished task (Oct 29, Oct 30, Nov 1, … since October ends on the 30th).
@@ -246,7 +248,7 @@ _Update 2026-11-03: the user confirmed real Google sign-in and a register/cancel
 - [x] **3. Parallelise event detail — 2026-11-01.** `fetchEventRow` is `React.cache()`-wrapped (one fetch shared by metadata, page, `getEvent`, `getEventRow`) and now selects `mode`; event-detail registration + seats, `/opportunities` rows + votes, and `/dashboard` registrations + `listEvents()` all run in parallel.
 - [x] **4. Suspense and loading.tsx — 2026-11-02.** `loading.tsx` added for `/events` (+ `/events/[slug]`), `/opportunities`, `/team`, `/dashboard`, `/admin`; home and `/events` stream their DB-backed sections under `<Suspense>` with skeletons while headers/static content paint first.
 - [x] **5. Responsive fixes (safe parts) — 2026-11-03.** Navbar is now solid white (the always-on `backdrop-blur` is gone); `LogoMark` takes Next 16's `preload` prop instead of the deprecated `priority` (hero updated); the admin `EmptyState` "Create event" action uses `Link`; both admin tables (`/admin/events`, `/admin/resources`) moved from `overflow-hidden` to `overflow-x-auto` so the five columns scroll instead of clipping on phones. The desktop nav moved to `xl` because the link row (~620 px) plus brand (~236 px) and the signed-in controls overflowed the `lg` inner width of 960 px at 1024–1280 px; the hamburger now covers that range. Hero text scale untouched.
-- [ ] **9. Smooth scroll, scroll-padding-top, text-wrap — 2026-11-04.** Set `scroll-padding-top` to ~5rem for the sticky header (`/events#announcements` currently lands under it); add `scroll-behavior: smooth` behind `prefers-reduced-motion: no-preference`; add `text-wrap: balance` on headings; add `data-scroll-behavior="smooth"` to `<html>` if Next warns.
+- [x] **9. Smooth scroll, scroll-padding-top, text-wrap — 2026-11-04.** `html { scroll-padding-top: 5rem }` clears the 4rem sticky header for anchors (`/events#announcements`); `scroll-behavior: smooth` sits behind `prefers-reduced-motion: no-preference`; `h1–h3` use `text-wrap: balance`; `<html data-scroll-behavior="smooth">` opts into Next 16's override so route changes stay instant while in-page anchors animate.
 - [ ] **10. Cache Components + PPR — 2026-11-05.** Separate PR: enable `cacheComponents` in Next 16; put the session-dependent navbar slot behind `<Suspense>`; cache public event/resource reads with `use cache`, `cacheLife` and `cacheTag` using a cookie-free anon Supabase client (requires public RLS reads); switch admin actions from `revalidatePath` to tag-based invalidation; test on a Vercel preview deploy.
 - [ ] **11. Partial prefetching — 2026-11-06.** Only after item 10; follow the Next 16.3 docs for the flag and verify instant navigation on a preview deploy.
 

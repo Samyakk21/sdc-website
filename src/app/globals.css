@@ -47,6 +47,26 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* The navbar is sticky and 4rem tall; keep anchored targets clear of it. */
+html {
+  scroll-padding-top: 5rem;
+}
+
+/* In-page anchor jumps only animate when the visitor hasn't asked for less
+   motion. Route navigations stay instant via data-scroll-behavior="smooth". */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Let multi-line headings fill their lines evenly instead of ragging. */
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
 :focus-visible {
   outline: 2px solid var(--color-brand-600);
   outline-offset: 2px;
