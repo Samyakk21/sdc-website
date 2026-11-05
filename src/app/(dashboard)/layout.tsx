@@ -1,19 +1,20 @@
 import type { ReactNode } from "react";
+import { Suspense } from "react";
 
-import { Navbar, type NavbarSession } from "@/components/layout/navbar";
+import { Navbar } from "@/components/layout/navbar";
+import { SessionNavbar } from "@/components/layout/session-navbar";
 import { Footer } from "@/components/layout/footer";
-import { getCurrentSession } from "@/lib/auth";
 
-export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  const session = await getCurrentSession();
+// Authenticated area: keep blocking on the server until the dashboard is
+// split into its own Suspense boundaries.
+export const instant = false;
 
-  const navbarSession: NavbarSession = session
-    ? { full_name: session.profile.full_name, role: session.profile.role }
-    : null;
-
+export default function DashboardLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      <Navbar session={navbarSession} />
+      <Suspense fallback={<Navbar session={null} />}>
+        <SessionNavbar />
+      </Suspense>
       <main id="main" tabIndex={-1} className="flex-1">
         {children}
       </main>

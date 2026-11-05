@@ -8,6 +8,9 @@ import { contact } from "@/lib/content/site";
 import { pageMetadata } from "@/lib/seo";
 import { GoogleSignInButton } from "./google-sign-in";
 
+// Reads the session to personalise the page.
+export const instant = false;
+
 export const metadata: Metadata = pageMetadata({
   title: "Sign In",
   description:

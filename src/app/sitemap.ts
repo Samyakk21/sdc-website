@@ -1,12 +1,9 @@
 import type { MetadataRoute } from "next";
+import { cacheLife, cacheTag } from "next/cache";
 
 import { listEvents } from "@/lib/events-repo";
 import { tracks } from "@/lib/content/tracks";
 import { absoluteUrl } from "@/lib/seo";
-
-// Events are stored in Supabase, so refresh the sitemap hourly instead of
-// freezing it at build time.
-export const revalidate = 3600;
 
 const publicRoutes: Array<{
   path: string;
@@ -24,6 +21,10 @@ const publicRoutes: Array<{
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  "use cache";
+  cacheLife("hours");
+  cacheTag("events");
+
   const staticEntries: MetadataRoute.Sitemap = publicRoutes.map(
     ({ path, priority, changeFrequency }) => ({
       url: absoluteUrl(path),

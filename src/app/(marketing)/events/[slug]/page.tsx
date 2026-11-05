@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+// Detail pages await params and per-user registration state.
+export const instant = false;
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Calendar, Clock, MapPin, Users } from "lucide-react";

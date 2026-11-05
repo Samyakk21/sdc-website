@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 import { z } from "zod";
 
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
@@ -69,9 +69,7 @@ export async function createResource(
     return { ok: false, message: "Couldn't create the resource. Please try again." };
   }
 
-  revalidatePath("/admin/resources");
-  revalidatePath("/resources");
-  revalidatePath("/");
+  updateTag("resources");
   return { ok: true, message: "Resource created." };
 }
 
@@ -119,9 +117,7 @@ export async function updateResource(
     return { ok: false, message: "Couldn't update the resource. Please try again." };
   }
 
-  revalidatePath("/admin/resources");
-  revalidatePath("/resources");
-  revalidatePath("/");
+  updateTag("resources");
   return { ok: true, message: "Resource updated." };
 }
 
@@ -138,7 +134,5 @@ export async function deleteResource(formData: FormData): Promise<void> {
   const supabase = await createClient();
   await supabase.from("resources").delete().eq("id", id);
 
-  revalidatePath("/admin/resources");
-  revalidatePath("/resources");
-  revalidatePath("/");
+  updateTag("resources");
 }

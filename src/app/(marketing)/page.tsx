@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 
 import { Hero } from "@/components/home/hero";
 import { AboutSection } from "@/components/home/about-section";
@@ -36,6 +37,9 @@ export default function HomePage() {
 }
 
 async function UpcomingEventsSection() {
+  // Date.now() must not run during prerendering; wait for the request.
+  await connection();
+
   const upcomingEvents = (await listEvents())
     .filter((event) => isFutureEvent(event))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());

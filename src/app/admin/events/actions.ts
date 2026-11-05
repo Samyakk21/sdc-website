@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 import { z } from "zod";
 
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
@@ -160,9 +160,7 @@ export async function createEvent(
     };
   }
 
-  revalidatePath("/admin/events");
-  revalidatePath("/events");
-  revalidatePath("/");
+  updateTag("events");
   return { ok: true, message: "Event created." };
 }
 
@@ -227,10 +225,7 @@ export async function updateEvent(
     };
   }
 
-  revalidatePath(`/admin/events`);
-  revalidatePath(`/events/${slug}`);
-  revalidatePath("/events");
-  revalidatePath("/");
+  updateTag("events");
   return { ok: true, message: "Event updated." };
 }
 
@@ -250,7 +245,5 @@ export async function deleteEvent(formData: FormData): Promise<void> {
   const supabase = await createClient();
   await supabase.from("events").delete().eq("slug", slug);
 
-  revalidatePath("/admin/events");
-  revalidatePath("/events");
-  revalidatePath("/");
+  updateTag("events");
 }

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 
 import { getVerifiedSession } from "@/lib/auth";
 import {
@@ -153,7 +153,7 @@ export async function createOpportunity(
     return { ok: false, message: "Couldn't share this opportunity. Please try again." };
   }
 
-  revalidatePath("/opportunities");
+  updateTag("opportunities");
   return { ok: true, message: "Your opportunity is now on the board." };
 }
 
@@ -209,7 +209,7 @@ export async function toggleOpportunityVote(
     return { ok: false, message: "Your vote was saved, but the count could not be refreshed." };
   }
 
-  revalidatePath("/opportunities");
+  updateTag("opportunities");
   return {
     ok: true,
     upvoted: !existingVote.data,

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
+import { connection } from "next/server";
 import { CalendarX2, Pin } from "lucide-react";
 
 import { PageHeader } from "@/components/ui/page-header";
@@ -7,6 +9,7 @@ import { SectionHeading } from "@/components/ui/section-heading";
 import { Badge } from "@/components/ui/badge";
 import { EventCard } from "@/components/events/event-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { LoadingLabel, Skeleton } from "@/components/ui/skeleton";
 import { listEvents } from "@/lib/events-repo";
 import { eventPhase } from "@/lib/event-status";
 import { announcements } from "@/lib/content/announcements";
@@ -20,17 +23,7 @@ export const metadata: Metadata = pageMetadata({
   path: "/events",
 });
 
-export default async function EventsPage() {
-  const events = await listEvents();
-
-  const byDate = (a: { date: string }, b: { date: string }) =>
-    new Date(a.date).getTime() - new Date(b.date).getTime();
-
-  const openNow = events.filter((e) => eventPhase(e) === "open").sort(byDate);
-  const concluded = events
-    .filter((e) => eventPhase(e) === "finished")
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
+export default function EventsPage() {
   const sortedAnnouncements = [...announcements].sort((a, b) => {
     if (a.pinned !== b.pinned) return a.pinned ? -1 : 1;
     return new Date(b.date).getTime() - new Date(a.date).getTime();
@@ -46,49 +39,9 @@ export default async function EventsPage() {
 
       <Container className="py-16 sm:py-20">
         <div className="space-y-16">
-          <section aria-labelledby="open-now-heading">
-            <SectionHeading
-              id="open-now-heading"
-              eyebrow="Open now"
-              title="Register for these sessions"
-              description="New registrations open when the next session is announced."
-            />
-            {openNow.length > 0 ? (
-              <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {openNow.map((event) => (
-                  <li key={event.slug} className="min-w-0">
-                    <EventCard event={event} />
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <div className="mt-8">
-                <EmptyState
-                  icon={<CalendarX2 className="h-8 w-8" aria-hidden />}
-                  title="Registration is closed right now"
-                  description="New registrations will open when the next event is announced."
-                />
-              </div>
-            )}
-          </section>
-
-          {concluded.length > 0 ? (
-            <section aria-labelledby="concluded-heading">
-              <SectionHeading
-                id="concluded-heading"
-                eyebrow="Concluded"
-                title="Recently concluded"
-                description="Events that wrapped up more than a week ago."
-              />
-              <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {concluded.map((event) => (
-                  <li key={event.slug} className="min-w-0">
-                    <EventCard event={event} />
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
+          <Suspense fallback={<EventsListsSkeleton />}>
+            <EventsLists />
+          </Suspense>
 
           {sortedAnnouncements.length > 0 ? (
             <section id="announcements" aria-labelledby="announcements-heading">
@@ -122,5 +75,81 @@ export default async function EventsPage() {
         </div>
       </Container>
     </>
+  );
+}
+
+async function EventsLists() {
+  // Event phases depend on the current time, so this section can't be part of
+  // the prerendered shell.
+  await connection();
+
+  const events = await listEvents();
+
+  const byDate = (a: { date: string }, b: { date: string }) =>
+    new Date(a.date).getTime() - new Date(b.date).getTime();
+
+  const openNow = events.filter((e) => eventPhase(e) === "open").sort(byDate);
+  const concluded = events
+    .filter((e) => eventPhase(e) === "finished")
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+  return (
+    <>
+      <section aria-labelledby="open-now-heading">
+        <SectionHeading
+          id="open-now-heading"
+          eyebrow="Open now"
+          title="Register for these sessions"
+          description="New registrations open when the next session is announced."
+        />
+        {openNow.length > 0 ? (
+          <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {openNow.map((event) => (
+              <li key={event.slug} className="min-w-0">
+                <EventCard event={event} />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="mt-8">
+            <EmptyState
+              icon={<CalendarX2 className="h-8 w-8" aria-hidden />}
+              title="Registration is closed right now"
+              description="New registrations will open when the next event is announced."
+            />
+          </div>
+        )}
+      </section>
+
+      {concluded.length > 0 ? (
+        <section aria-labelledby="concluded-heading">
+          <SectionHeading
+            id="concluded-heading"
+            eyebrow="Concluded"
+            title="Recently concluded"
+            description="Events that wrapped up more than a week ago."
+          />
+          <ul className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {concluded.map((event) => (
+              <li key={event.slug} className="min-w-0">
+                <EventCard event={event} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </>
+  );
+}
+
+function EventsListsSkeleton() {
+  return (
+    <section aria-hidden>
+      <LoadingLabel label="Loading events" />
+      <Skeleton className="h-3 w-24" />
+      <Skeleton className="mt-3 h-8 w-80 max-w-full" />
+      <Skeleton className="mt-3 h-4 w-full max-w-xl" />
+      <Skeleton className="mt-8 h-72 w-full rounded-xl" />
+    </section>
   );
 }

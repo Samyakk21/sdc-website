@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { updateTag } from "next/cache";
 
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
 import { getVerifiedSession } from "@/lib/auth";
@@ -84,8 +84,7 @@ export async function registerForEvent(
     return { ok: false, message: "Couldn't complete your registration. Please try again." };
   }
 
-  revalidatePath(`/events/${slug}`);
-  revalidatePath("/dashboard");
+  updateTag("registrations");
   return { ok: true, message: "You're registered! See you there." };
 }
 
@@ -139,7 +138,6 @@ export async function cancelRegistration(
     return { ok: false, message: "Couldn't cancel your registration. Please try again." };
   }
 
-  revalidatePath(`/events/${slug}`);
-  revalidatePath("/dashboard");
+  updateTag("registrations");
   return { ok: true, message: "Your registration has been cancelled." };
 }

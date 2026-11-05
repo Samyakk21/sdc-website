@@ -7,6 +7,9 @@ import { listOpportunities } from "@/lib/opportunities-repo";
 import { getCurrentSession } from "@/lib/auth";
 import { pageMetadata } from "@/lib/seo";
 
+// Reads the session to personalise the page.
+export const instant = false;
+
 export const metadata: Metadata = pageMetadata({
   title: "Opportunities",
   description:

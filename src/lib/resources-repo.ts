@@ -1,6 +1,9 @@
 import type { Resource } from "@/lib/types";
 import { resources as staticResources } from "@/lib/content/resources";
+import { cacheLife, cacheTag } from "next/cache";
+
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 
 export type ResourceRow = {
   id: string;
@@ -27,9 +30,13 @@ function toResource(row: ResourceRow): Resource {
 }
 
 async function fetchResources(): Promise<Resource[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("resources");
+
   if (!hasSupabaseEnv()) return [];
 
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   const { data, error } = await supabase
     .from("resources")
     .select("id, title, description, type, category, url, author, is_published")
@@ -51,9 +58,13 @@ export async function listResources(): Promise<Resource[]> {
 }
 
 async function fetchResource(id: string): Promise<ResourceRow | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("resources");
+
   if (!hasSupabaseEnv()) return null;
 
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   const { data, error } = await supabase
     .from("resources")
     .select("id, title, description, type, category, url, author, is_published")

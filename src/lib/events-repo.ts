@@ -1,8 +1,9 @@
-import { cache } from "react";
-
 import type { SDCEvent, EventMode } from "@/lib/types";
 import { events as staticEvents, getEvent as getStaticEvent } from "@/lib/content/events";
+import { cacheLife, cacheTag } from "next/cache";
+
 import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
+import { createAnonClient } from "@/lib/supabase/anon";
 
 export type EventRow = {
   id: string;
@@ -63,9 +64,13 @@ export function toEvent(row: EventRow): SDCEvent {
 }
 
 async function fetchEvents(): Promise<SDCEvent[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("events");
+
   if (!hasSupabaseEnv()) return [];
 
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   const { data, error } = await supabase
     .from("events")
     .select("id, slug, title, tagline, description, status, starts_at, ends_at, is_online, mode, location, capacity, registration_deadline, organizer")
@@ -88,13 +93,18 @@ export async function listEvents(): Promise<SDCEvent[]> {
 }
 
 /**
- * One row per slug per request. `generateMetadata`, the page and `getEvent()`
- * all call this, so React.cache() turns those into a single query.
+ * One row per slug. `generateMetadata`, the page and `getEvent()` all call
+ * this; `use cache` shares the result across requests until the `events` tag
+ * is invalidated by an admin action.
  */
-const fetchEventRow = cache(async (slug: string): Promise<EventRow | null> => {
+async function fetchEventRow(slug: string): Promise<EventRow | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("events");
+
   if (!hasSupabaseEnv()) return null;
 
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   const { data, error } = await supabase
     .from("events")
     .select("id, slug, title, tagline, description, status, starts_at, ends_at, is_online, mode, location, capacity, registration_deadline, organizer")
@@ -103,7 +113,7 @@ const fetchEventRow = cache(async (slug: string): Promise<EventRow | null> => {
 
   if (error || !data) return null;
   return data as EventRow;
-});
+}
 
 export async function getEvent(slug: string): Promise<SDCEvent | null> {
   const row = await fetchEventRow(slug);
@@ -123,9 +133,13 @@ export async function getEventRow(slug: string): Promise<EventRow | null> {
 
 /** Active (status = 'registered') seat count for an event. */
 export async function getSeatsFilled(eventId: string): Promise<number> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag("registrations");
+
   if (!hasSupabaseEnv()) return 0;
 
-  const supabase = await createClient();
+  const supabase = createAnonClient();
   const { data } = await supabase.rpc("count_active_registrations", {
     p_event_id: eventId,
   });

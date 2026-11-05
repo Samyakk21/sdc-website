@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+// Track detail pages await params; keep them blocking.
+export const instant = false;
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, CheckCircle2 } from "lucide-react";
