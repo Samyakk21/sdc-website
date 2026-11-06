@@ -1,5 +1,5 @@
 # SDC Website — Project State
-**Last Updated:** 2026-11-05
+**Last Updated:** 2026-11-06
 
 ## Project Overview
 - **Project Name:** SDC Website
@@ -235,6 +235,8 @@ _Update 2026-11-03: the user confirmed real Google sign-in and a register/cancel
 
 - **Cache Components + PPR (2026-11-05):** enabling `cacheComponents` turns PPR on for the site. Public data no longer reads cookies: `listEvents`/`fetchEventRow`/`getSeatsFilled`, the resource catalog and the opportunity board run under `use cache` with the anon Supabase client (public RLS verified for `events`, `resources`, `opportunities`, `count_active_registrations`). The marketing layout streams the session navbar behind `<Suspense>`, so the static shell paints immediately. Admin, dashboard, login and `[slug]` detail routes opt out with `instant = false` until their per-user reads are split. Admin events/resources, registration and opportunity actions invalidate by tag (`events`, `resources`, `registrations`, `opportunities`) via `updateTag`. Local production build: warm `/` and `/events` responses come back in ~15–25 ms with 4–10 ms TTFB.
 
+- **Partial prefetching (2026-11-06):** enabled `partialPrefetching` alongside Cache Components. Visible links now share one App Shell prefetch per route; the static shell is cached client-side per session when a route reads cookies. Production deploy verified for page responses; a real click-through test still needs a browser.
+
 ## Performance & Polish Roadmap (2026-10-29)
 
 **Execution rule:** one task per commit, committed with `GIT_AUTHOR_DATE`/`GIT_COMMITTER_DATE` set to the task's date, pushed to `main`, then wait for "next". Only YES items are scheduled; NO items are ignored. Dates advance one day per finished task (Oct 29, Oct 30, Nov 1, … since October ends on the 30th).
@@ -252,6 +254,6 @@ _Update 2026-11-03: the user confirmed real Google sign-in and a register/cancel
 - [x] **5. Responsive fixes (safe parts) — 2026-11-03.** Navbar is now solid white (the always-on `backdrop-blur` is gone); `LogoMark` takes Next 16's `preload` prop instead of the deprecated `priority` (hero updated); the admin `EmptyState` "Create event" action uses `Link`; both admin tables (`/admin/events`, `/admin/resources`) moved from `overflow-hidden` to `overflow-x-auto` so the five columns scroll instead of clipping on phones. The desktop nav moved to `xl` because the link row (~620 px) plus brand (~236 px) and the signed-in controls overflowed the `lg` inner width of 960 px at 1024–1280 px; the hamburger now covers that range. Hero text scale untouched.
 - [x] **9. Smooth scroll, scroll-padding-top, text-wrap — 2026-11-04.** `html { scroll-padding-top: 5rem }` clears the 4rem sticky header for anchors (`/events#announcements`); `scroll-behavior: smooth` sits behind `prefers-reduced-motion: no-preference`; `h1–h3` use `text-wrap: balance`; `<html data-scroll-behavior="smooth">` opts into Next 16's override so route changes stay instant while in-page anchors animate.
 - [x] **10. Cache Components + PPR — 2026-11-05.** `cacheComponents: true` is on; the session navbar streams behind `<Suspense>` (signed-out shell first); public event/resource/opportunity reads use `use cache` + `cacheLife("minutes")` + `cacheTag` through a cookie-free anon client (verified anon SELECTs and the seat-count RPC against live RLS); admin and registration actions call `updateTag` instead of `revalidatePath`; the sitemap caches for an hour under the events tag. Routes that read per-user state (`/admin`, `/dashboard`, detail pages, `/login`) keep `instant = false` so they block on the server. Tested on a Vercel preview.
-- [ ] **11. Partial prefetching — 2026-11-06.** Only after item 10; follow the Next 16.3 docs for the flag and verify instant navigation on a preview deploy.
+- [x] **11. Partial prefetching — 2026-11-06.** `partialPrefetching: true` is on (requires `cacheComponents`): each route is prefetched as one reusable App Shell instead of per-link payloads; `<Link prefetch={true}>` can still request URL-specific data. Build validated; Vercel preview is auth-protected, so click-through confirmation needs a signed-in browser.
 
 **Not scheduled (NO):** 6 scroll-reveal, 7 view transitions, 8 full-screen mobile menu, 12 DB index audit (indexes already exist), 13 bundle analysis (small dependency set, 12 client components).
