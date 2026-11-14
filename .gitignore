@@ -40,3 +40,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# imported club site snapshot (separate repo)
+/legacy/eecs-website/
